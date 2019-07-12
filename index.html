@@ -1,0 +1,38 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Javascript - Bookshelf</title>
+</head>
+
+<body>
+    <div id="container">
+        <header>
+            <h1>Bookshelf</h1>
+            <h4>built with javascript</h4>
+        </header>
+        <div class="row">
+            <div class="col">
+                <div id="book">
+                    <div>
+                        <header id="book-title"></header>
+                        <section id="book-details"></section>
+                        <footer id="book-author"></footer>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/app.js"></script>
+    <script>
+        var bookTwo = new Book("Playing to Win", "A.G. Lafley", 260);
+
+        document.getElementById("book-title").innerHTML = bookTwo.title;
+        document.getElementById("book-author").innerHTML = bookTwo.author;
+        document.getElementById("book-details").innerHTML = `This book has ${Book.totalPages(bookTwo)} pages.`;
+    </script>
+</body>
+
+</html>
