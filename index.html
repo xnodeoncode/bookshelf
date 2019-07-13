@@ -27,11 +27,18 @@
     </div>
     <script src="js/app.js"></script>
     <script>
+        var bookOne = new Book("Playing to Win", "A.G. Lafley", 260);
         var bookTwo = new Book("Playing to Win", "A.G. Lafley", 260);
+        bookDepot.addBook(new Book("Her First Bible","Melody Carlson", 91));
 
-        document.getElementById("book-title").innerHTML = bookTwo.title;
-        document.getElementById("book-author").innerHTML = bookTwo.author;
-        document.getElementById("book-details").innerHTML = `This book has ${Book.totalPages(bookTwo)} pages.`;
+        bookDepot.addBook(bookOne);
+        bookDepot.addBook(bookTwo);
+
+        bookDepot.removeBook(bookOne);
+
+        document.getElementById("book-title").innerHTML = bookOne.title;
+        document.getElementById("book-author").innerHTML = bookOne.author;
+        document.getElementById("book-details").innerHTML = `This book has ${Book.totalPages(bookOne)} pages.`;
     </script>
 </body>
 

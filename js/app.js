@@ -1,5 +1,6 @@
 class Book {
     constructor(title, author, numberOfPages) {
+        this.id = 0;
         this.title = title;
         this.author = author;
         this.numberOfPages = numberOfPages;
@@ -14,7 +15,21 @@ class Book {
     }
 }
 
-var bookOne = new Book("Playing to Win", "A.G. Lafley", 260);
-console.log(bookOne.getDetails());
+var bookDepot = {
+    books:[],
 
-console.log(Book.totalPages(bookOne));
+    addBook:function(book){
+        book.id = this.books.length + 1;
+        this.books.push(book);
+        console.log(this.books);
+    },
+
+    removeBook:function(book){
+        for (let b in this.books){
+            if(this.books[b].id === book.id){
+                this.books.splice(this.books.findIndex(i => i.id === book.id),1);
+            }
+        }
+        console.log(this.books);
+    }
+}
