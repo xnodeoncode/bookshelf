@@ -43,7 +43,10 @@
 
         // bind click event to the button.
         (function(){
-            document.getElementById('new-book-form-button').addEventListener('click', saveNewBook);
+            document.getElementById('new-book-form-button').addEventListener('click', function(event){
+                saveNewBook();
+                event.preventDefault();
+            });
         })();
 
         // create two instances of a book.

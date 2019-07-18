@@ -35,5 +35,5 @@ var bookDepot = {
         }
         console.log(this.books);
     }
-    
+
 };
