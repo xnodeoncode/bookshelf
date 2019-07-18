@@ -40,30 +40,46 @@
     </div>
     <script src="js/app.js"></script>
     <script>
+
+        // bind click event to the button.
         (function(){
             document.getElementById('new-book-form-button').addEventListener('click', saveNewBook);
         })();
 
+        // create two instances of a book.
         var bookOne = new Book("Playing to Win", "A.G. Lafley", 260);
         var bookTwo = new Book("Playing to Win", "A.G. Lafley", 260);
-        bookDepot.addBook(new Book("Her First Bible","Melody Carlson", 91));
 
+        // add the two books to the depot.
         bookDepot.addBook(bookOne);
         bookDepot.addBook(bookTwo);
 
+        // add a book to the depot.
+        bookDepot.addBook(new Book("Her First Bible","Melody Carlson", 91));
+
+        // remove one book from the depot.
         bookDepot.removeBook(bookOne);
 
+        // update the html display elements.
         document.getElementById("book-title").innerHTML = bookOne.title;
         document.getElementById("book-author").innerHTML = bookOne.author;
         document.getElementById("book-details").innerHTML = `This book has ${Book.totalPages(bookOne)} pages.`;
 
+        // function to save a new book from values entered on the page.
         function saveNewBook(){
+
+            // get values from the html input elements.
             let title = document.getElementById('new-book-title').value;
             let author = document.getElementById('new-book-author').value;
             let pages = document.getElementById('new-book-numberOfPages').value;
 
+            // create a new book using the values and add it to the depot.
             bookDepot.addBook(new Book(title,author,pages));
+
+            // write the title of the new book to the console.
             console.log(`The new book ${title}, has been added to the depot.`);
+
+            // write the bookDepot object to the console to validate its properties.
             console.log(bookDepot);
         }
     </script>

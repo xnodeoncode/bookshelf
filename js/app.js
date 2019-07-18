@@ -1,3 +1,4 @@
+// book class to instantiate new books.
 class Book {
     constructor(title, author, numberOfPages) {
         this.id = 0;
@@ -15,7 +16,9 @@ class Book {
     }
 }
 
+// book depot object used to manage the book collection.
 var bookDepot = {
+
     books:[],
 
     addBook:function(book){
@@ -32,4 +35,5 @@ var bookDepot = {
         }
         console.log(this.books);
     }
-}
+    
+};
