@@ -11,7 +11,7 @@
     <div id="container">
         <header>
             <h1>Bookshelf</h1>
-            <h4>built with javascript</h4>
+            <h4>built with native Javascript and HTML5</h4>
         </header>
         <div class="row">
             <div class="col">
@@ -29,11 +29,7 @@
         <div class="row">
             <div class="col">
                 <div id="book-list">
-                    <div>
-                        <header id="book-title"></header>
-                        <section id="book-details"></section>
-                        <footer id="book-author"></footer>
-                    </div>
+                    <ul id="books"></ul>
                 </div>
             </div>
         </div>
@@ -47,26 +43,67 @@
                 saveNewBook();
                 event.preventDefault();
             });
+
+            // create two instances of a book.
+            var bookOne = new Book("Playing to Win", "A.G. Lafley", 260);
+            var bookTwo = new Book("Everyday A Friday", "Joel Olsteen", 224);
+            
+            // add the two books to the depot.
+            bookDepot.addBook(bookOne);
+            bookDepot.addBook(bookTwo);
+
+            // add a book to the depot.
+            bookDepot.addBook(new Book("Her First Bible","Melody Carlson", 91));
+            
+            updateListDisplay();
+
+            resetForm();
         })();
 
-        // create two instances of a book.
-        var bookOne = new Book("Playing to Win", "A.G. Lafley", 260);
-        var bookTwo = new Book("Playing to Win", "A.G. Lafley", 260);
+       function resetForm(){
+        var inputs = document.querySelectorAll("input[type='text']");
+            for(var x = 0, element; element = inputs[x++];){
+                 element.value = "";
+            }
+            inputs[0].focus();
+       }
 
-        // add the two books to the depot.
-        bookDepot.addBook(bookOne);
-        bookDepot.addBook(bookTwo);
+        function updateListDisplay() {
 
-        // add a book to the depot.
-        bookDepot.addBook(new Book("Her First Bible","Melody Carlson", 91));
+            // access the book container
+            var bookList = document.getElementById("books");
+            
+            // clear the existing items
+            bookList.innerHTML = "";
 
-        // remove one book from the depot.
-        bookDepot.removeBook(bookOne);
+            // iterate over books collection and display each title
+            for(var x=0; x <= bookDepot.books.length - 1; x++) {
 
-        // update the html display elements.
-        document.getElementById("book-title").innerHTML = bookOne.title;
-        document.getElementById("book-author").innerHTML = bookOne.author;
-        document.getElementById("book-details").innerHTML = `This book has ${Book.totalPages(bookOne)} pages.`;
+                // iterate through book collection and create the display list.
+                var book = bookDepot.books[x];
+                var br = document.createElement("br");
+                
+                // create a list element to hold book details
+                var li = document.createElement("li");
+                li.appendChild(document.createTextNode(book.title));
+
+                // create link to delete the book.
+                var a = document.createElement("a")
+                a.setAttribute("href","#")
+                a.setAttribute("id",book.id);
+                a.setAttribute("data-book-id",book.id);
+                a.textContent = " delete";
+                li.appendChild(a);
+                a.addEventListener("click", function(event){
+                    deleteBook(this.id);
+                    event.preventDefault();
+                });
+
+                // add the book to the list.
+                bookList.appendChild(li);
+                bookList.appendChild(br);
+            }
+        }
 
         // function to save a new book from values entered on the page.
         function saveNewBook(){
@@ -84,7 +121,17 @@
 
             // write the bookDepot object to the console to validate its properties.
             console.log(bookDepot);
+            updateListDisplay();
+
+            resetForm();
         }
+
+        // function to delete a book from the repository
+        function deleteBook(bookId){
+            bookDepot.removeBookById(bookId);
+            updateListDisplay();
+        }
+
     </script>
 </body>
 

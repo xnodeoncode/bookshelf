@@ -1,0 +1,16 @@
+*{
+    margin:0 0;
+    padding:0 0;
+}
+
+li {
+    padding: 5px;
+    margin:5px;
+}
+
+form {
+    display:block;
+}
+label {
+    padding: 5px;
+}
