@@ -60,7 +60,8 @@ var bookDepot = {
     removeBookById:function(bookId){
         bookId = parseInt(bookId);
         var b = this.books.find(item => item.id == bookId);
-        this.books.splice(this.books.findIndex(i=>i.id == b.id),1);
+        //this.books.splice(this.books.findIndex(i=>i.id == b.id),1);
+        this.books = this.books.filter(o => o.id !== b.id);
         console.log(`Book ${bookId} has been deleted by id.`);
         console.log(this.books);
     },
