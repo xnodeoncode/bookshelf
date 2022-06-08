@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="./css/site.css" />
     <title>Javascript - Bookshelf</title>
 </head>
 
@@ -108,7 +109,7 @@
                 a.setAttribute("id","u-" + book.id);
                 a.setAttribute("data-book-id",book.id);
                 a.setAttribute("data-action","update")
-                a.textContent = " update";
+                a.textContent = "update";
                 li.appendChild(a);
                 a.addEventListener("click", function(event){
                     updateBook(this.dataset.bookId);
@@ -130,7 +131,7 @@
 
                 // add the book to the list.
                 bookList.appendChild(li);
-                bookList.appendChild(br);
+                //bookList.appendChild(br);
             }
         }
 

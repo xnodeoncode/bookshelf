@@ -1,16 +1,12 @@
-*{
-    margin:0 0;
-    padding:0 0;
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 li {
-    padding: 5px;
     margin:5px;
+    list-style-type: none;
 }
 
 form {
     display:block;
-}
-label {
-    padding: 5px;
 }
