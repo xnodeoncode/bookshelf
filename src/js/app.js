@@ -39,7 +39,7 @@ var bookDepot = {
     addBook:function(book){
         book.id = parseInt(book.id);
         book.id = (book.id == 0) ? this.generateId() : book.id;
-        book.numberOfPages = parseInt(book.numberOfPages);
+        book.numberOfPages = parseInt(book.numberOfPages * 1);
         this.books.push(book);
         this.sort();
         console.log(`${book.title} has been added to the book collection.`);
@@ -55,6 +55,7 @@ var bookDepot = {
         book.id = parseInt(book.id);
         this.books = this.books.filter(obj => obj.id !== book.id);
         console.log(`${book.title} has been removed from the book collection.`);
+        this.sort();
     },
 
     removeBookById:function(bookId){
@@ -62,17 +63,28 @@ var bookDepot = {
         var b = this.books.find(item => item.id == bookId);
         this.books = this.books.filter(o => o.id !== b.id);
         console.log(`Book ${bookId} has been deleted by id.`);
+        this.sort();
         console.log(this.books);
     },
 
     sort:function(){
-        this.books.sort(function(a,b){
-            return a.id - b.id;
+        var sorted = this.books.sort((a,b) => {
+
+            if(a.title < b.title){
+                return -1;
+            }
+
+            if(a.title > b.title){
+                return 1;
+            }
+
+            return 0;
         });
+        this.books = sorted;
     },
 
     log:function(book,message){
-        console.log(`${book.title} ${message}`)
+        console.log(`${book.title} ${message}`);
     }
 
 };
