@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="./css/site.css" />
     <title>Javascript - Bookshelf</title>
 </head>
 
@@ -20,13 +21,14 @@
         <div class="row">
             <div class="col">
                 <fieldset id="new-book-fieldset">
-                    <legend>New Book</legend>
+                    <legend>Book Details</legend>
                     <form>
                         <input type="hidden" id="new-book-id" value="0" />
                         <label for="new-book-title">Title:</label><input type="text" id="new-book-title" />
                         <label for="new-book-author">Author:</label><input type="text" id="new-book-author" />
                         <label for="new-book-numberOfPages">Page count:</label><input type="text" id="new-book-numberOfPages" />
-                        <button id="new-book-form-button">Save</button>
+                        <button id="new-book-form-button" type="submit">Save</button>
+                        <button id="clear-form" type="reset">Clear</button>
                     </form>
                 </fieldset>
             </div>
@@ -48,6 +50,11 @@
                 saveBook();
                 event.preventDefault();
             });
+
+            document.getElementById("clear-form").addEventListener('click',function(event){
+                resetForm();
+                event.preventDefault();
+            })
 
             // create two instances of a book.
             var bookOne = new Book("Playing to Win", "A.G. Lafley", 260);
@@ -72,7 +79,7 @@
             for(var x = 0, element; element = inputs[x++];){
                  element.value = "";
             }
-
+            document.getElementById('new-book-id').value = 0;
             inputs[0].focus();
        }
 
@@ -102,7 +109,7 @@
                 a.setAttribute("id","u-" + book.id);
                 a.setAttribute("data-book-id",book.id);
                 a.setAttribute("data-action","update")
-                a.textContent = " update";
+                a.textContent = "update";
                 li.appendChild(a);
                 a.addEventListener("click", function(event){
                     updateBook(this.dataset.bookId);
@@ -124,7 +131,7 @@
 
                 // add the book to the list.
                 bookList.appendChild(li);
-                bookList.appendChild(br);
+                //bookList.appendChild(br);
             }
         }
 
