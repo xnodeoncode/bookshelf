@@ -34,7 +34,6 @@ var bookDepot = {
     getBookById:function(bookId){
         bookId = parseInt(bookId);
         var book = this.books.find(b=>b.id == bookId);
-        console.log(`Found ${book.title} by id.`);
         return book;
     },
 
@@ -44,29 +43,28 @@ var bookDepot = {
         book.numberOfPages = parseInt(book.numberOfPages * 1);
         this.books.push(book);
         this.sort();
-        console.log(`${book.title} has been added to the book collection.`);
+        return this.log(book,` ${book.title} has been added.`);
     },
 
     updateBook:function(book){
         this.removeBook(book);
         this.addBook(book);
-        this.log(book,"has been updated.");
+        return this.log(book,` ${book.title} has been updated.`);
     },
 
     removeBook:function(book){
         book.id = parseInt(book.id);
         this.books = this.books.filter(obj => obj.id !== book.id);
-        console.log(`${book.title} has been removed from the book collection.`);
         this.sort();
+        return this.log(book,` ${book.title} has been removed.`);
     },
 
     removeBookById:function(bookId){
         bookId = parseInt(bookId);
         var b = this.books.find(item => item.id == bookId);
         this.books = this.books.filter(o => o.id !== b.id);
-        console.log(`Book ${bookId} has been deleted by id.`);
         this.sort();
-        console.log(this.books);
+        return this.log(b,` ${b.title} has been removed by ID.`);
     },
 
     sort:function(){
@@ -86,7 +84,7 @@ var bookDepot = {
     },
 
     log:function(book,message){
-        console.log(`${book.title} ${message}`);
+        return {book, message};
     }
 
 };
