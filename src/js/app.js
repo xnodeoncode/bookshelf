@@ -5,7 +5,7 @@
             +'<h4>built with plain-old Javascript and HTML5</h4>'
             +'</header>'
             +'<p>'
-            +'The aim of this project was to test how long it would take to develop a simple app using native browser language features. The conclusion was...too long.'
+            +'The aim of this project was to test how long it would take to develop a simple app using native browser language features. The conclusion was...too long. '
             +'Javascript libraries coupled with HTML5/CSS templates, while adding to the complexity of the app, can drastically reduce time to completion.'
             +'</p>'
             +'<div class="row">'
@@ -14,8 +14,8 @@
             +'<legend>Book Details</legend>'
             +'<form style="display:inline-block; padding:5px;">'
             +'<input type="hidden" id="new-book-id" value="0" />'
-            +'<label for="new-book-title">Title:</label><input type="text" id="new-book-title"  style="display:inline-block; margin-left:8px" />'
-            +'<label for="new-book-author" style="margin-left:8px">Author:</label><input type="text" id="new-book-author"  style="display:inline-block; margin-left:8px" />'
+            +'<label for="new-book-title">Title:</label><input type="text" id="new-book-title" style="display:inline-block; margin-left:8px" />'
+            +'<label for="new-book-author" style="margin-left:8px">Author:</label><input type="text" id="new-book-author" style="display:inline-block; margin-left:8px" />'
             +'<label for="new-book-numberOfPages" style="margin-left:8px">Page count:</label><input type="number" id="new-book-numberOfPages"  style="display:inline-block; margin-left:8px" />'
             +'<button id="new-book-form-button" type="submit"  style="display:inline-block; margin-left:8px">Save</button>'
             +'<button id="clear-form" type="reset"  style="display:inline-block; margin-left:8px">Clear</button>'
@@ -72,18 +72,24 @@
 function resetForm(){
 
     // get all inputs
-    var inputs = document.querySelectorAll("input[type='text']");
+    var inputs = document.querySelectorAll("input[type='text'],input[type='number'");
+    console.log(inputs.length);
 
     // traditional for loop over the collection of elements.
-    for(var x = 0, element; element == inputs[x++];){
-         element.value = "";
+    for(var x = 0; x <= inputs.length; x++){
+        var element = inputs[x];
+        if(element){
+            element.value = "";
+        } 
     }
 
     // set new book id to 0.
     document.getElementById('new-book-id').value = 0;
     
     // set focus on the first input
-    inputs[0].focus();
+    //inputs[0].focus();
+    document.getElementById('new-book-title').focus();
+
 }
 /*
     Update book list display
