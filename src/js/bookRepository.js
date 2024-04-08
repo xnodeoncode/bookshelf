@@ -7,10 +7,16 @@ class Book {
         this.title = title;
         this.author = author;
         this.numberOfPages = numberOfPages;
+        this.createdOn = this.getDate();
     }
 
-    getDetails() {
-        return `${this.title} is ${this.numberOfPages} long and was written by ${this.author}`;
+    getDate(){
+        var today = new Date();
+        return today.toLocaleDateString();
+    }
+
+    static details() {
+        return `${this.title} has ${this.numberOfPages} pages and was written by ${this.author}`;
     }
 
     static totalPages(book) {

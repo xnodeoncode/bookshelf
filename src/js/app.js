@@ -1,4 +1,4 @@
- // App Interface
+ // App Interface or controller (MVC).
 
  const markUp = '<header>'
             +'<h1>Bookshelf</h1>'
@@ -105,6 +105,7 @@ function updateListDisplay() {
         +'<th>Title</th>'
         +'<th>Author</th>'
         +'<th>No. of Pages</th>'
+        +'<th>Date Added</th>'
         +'<th>Actions</th>'
         +'</tr>'
         +'</table>';
@@ -137,6 +138,12 @@ function updateListDisplay() {
                 pagesTD.innerHTML = book.numberOfPages;
                 pagesTD.setAttribute("style","text-align:center");
                 tr.appendChild(pagesTD);
+
+                 // create a table cell for the date added
+                 var dateTD = document.createElement("td");
+                 dateTD.innerHTML = book.createdOn;
+                 dateTD.setAttribute("style","text-align:center");
+                 tr.appendChild(dateTD);
 
                 // create a table cell for the actions such as update/delete
                 var actionsTD = document.createElement("td");
@@ -183,7 +190,7 @@ function updateListDisplay() {
 }
 
 /*
-    Save a new book from the form values.
+    Save a new book from the form values. This could be pushed back to the book depot, but I kind of like it sitting in this "controller".
 */
 function saveBook(){
 
@@ -192,6 +199,7 @@ function saveBook(){
     let author = document.getElementById('new-book-author').value;
     let pages = document.getElementById('new-book-numberOfPages').value;
     let id = parseInt(document.getElementById('new-book-id').value);
+
     var b = {};
 
     // if the title and author fields are blank, exit without saving.
