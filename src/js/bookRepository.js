@@ -2,95 +2,95 @@
 
 // book class to instantiate new books.
 class Book {
-    constructor(title, author, numberOfPages) {
-        this.id = 0;
-        this.title = title;
-        this.author = author;
-        this.numberOfPages = numberOfPages;
-        this.createdOn = this.getDate();
-    }
+  constructor(title, author, numberOfPages) {
+    this.id = 0;
+    this.title = title;
+    this.author = author;
+    this.numberOfPages = numberOfPages;
+    this.createdOn = this.getDate();
+  }
 
-    getDate(){
-        var today = new Date();
-        return today.toLocaleDateString();
-    }
+  // get current date as a locale string
+  getDate() {
+    let today = new Date();
+    return today.toLocaleDateString();
+  }
 
-    static details() {
-        return `${this.title} has ${this.numberOfPages} pages and was written by ${this.author}`;
-    }
+  // Returns book details to the.
+  static getDetails(book) {
+    return `${book.title} has ${book.numberOfPages} pages and was written by ${book.author}`;
+  }
 
-    static totalPages(book) {
-        return book.numberOfPages;
-    }
+  static totalPages(book) {
+    return book.numberOfPages;
+  }
 }
 
 // book depot object used to manage the book collection.
 var bookDepot = {
+  books: [],
 
-    books:[],
+  iterator: 0,
 
-    iterator:0,
+  generateId: function () {
+    this.iterator++;
+    return this.iterator;
+  },
 
-    generateId:function(){
+  getBookById: function (bookId) {
+    bookId = parseInt(bookId);
+    let book = this.books.find((b) => b.id == bookId);
+    return book;
+  },
 
-        this.iterator++;
-        return this.iterator;
-    },
+  addBook: function (book) {
+    book.id = parseInt(book.id);
+    book.id = book.id == 0 ? this.generateId() : book.id;
+    book.numberOfPages = parseInt(book.numberOfPages * 1);
+    this.books.push(book);
+    this.sort();
+    return this.log(book, ` ${book.title} has been added.`);
+  },
 
-    getBookById:function(bookId){
-        bookId = parseInt(bookId);
-        var book = this.books.find(b=>b.id == bookId);
-        return book;
-    },
+  updateBook: function (book) {
+    this.removeBook(book);
+    this.addBook(book);
+    return this.log(book, ` ${book.title} has been updated.`);
+  },
 
-    addBook:function(book){
-        book.id = parseInt(book.id);
-        book.id = (book.id == 0) ? this.generateId() : book.id;
-        book.numberOfPages = parseInt(book.numberOfPages * 1);
-        this.books.push(book);
-        this.sort();
-        return this.log(book,` ${book.title} has been added.`);
-    },
+  removeBook: function (book) {
+    book.id = parseInt(book.id);
+    this.books = this.books.filter((obj) => obj.id !== book.id);
+    this.sort();
+    return this.log(book, ` ${book.title} has been removed.`);
+  },
 
-    updateBook:function(book){
-        this.removeBook(book);
-        this.addBook(book);
-        return this.log(book,` ${book.title} has been updated.`);
-    },
+  removeBookById: function (bookId) {
+    bookId = parseInt(bookId);
+    let b = this.books.find((item) => item.id == bookId);
+    this.books = this.books.filter((o) => o.id !== b.id);
+    this.sort();
+    return this.log(b, ` ${b.title} has been removed by ID.`);
+  },
 
-    removeBook:function(book){
-        book.id = parseInt(book.id);
-        this.books = this.books.filter(obj => obj.id !== book.id);
-        this.sort();
-        return this.log(book,` ${book.title} has been removed.`);
-    },
+  sort: function () {
+    let sorted = this.books.sort((a, b) => {
+      if (a.title < b.title) {
+        return -1;
+      }
 
-    removeBookById:function(bookId){
-        bookId = parseInt(bookId);
-        var b = this.books.find(item => item.id == bookId);
-        this.books = this.books.filter(o => o.id !== b.id);
-        this.sort();
-        return this.log(b,` ${b.title} has been removed by ID.`);
-    },
+      if (a.title > b.title) {
+        return 1;
+      }
 
-    sort:function(){
-        var sorted = this.books.sort((a,b) => {
+      return 0;
+    });
+    this.books = sorted;
+  },
 
-            if(a.title < b.title){
-                return -1;
-            }
-
-            if(a.title > b.title){
-                return 1;
-            }
-
-            return 0;
-        });
-        this.books = sorted;
-    },
-
-    log:function(book,message){
-        return {book, message};
-    }
-
+  log: function (book, message) {
+    console.log(Book.getDetails(book));
+    console.log(message);
+    return { book, message };
+  },
 };
