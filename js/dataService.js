@@ -68,6 +68,24 @@ export class dataContext {
     };
   }
 
+  retrieve(persistenceType, databaseName) {
+    if (persistenceType == persistenceTypes.Cookie) {
+      let cookieData = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith(`${databaseName}=`))
+        ?.split("=")[1];
+
+      let data = [];
+
+      if (cookieData != null && cookieData.length > 0) {
+        //let jsonString = cookieData[1];
+        data = JSON.parse(cookieData);
+      }
+
+      return data;
+    }
+  }
+
   // add a record to the datastore using a indexeddb transaction.
   persist(persistenceType, databaseName, database) {
     // set the key field value based on the current date/time.

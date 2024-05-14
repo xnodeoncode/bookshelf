@@ -1,12 +1,8 @@
-import {
-  dataContext,
-  dbTransactionModes,
-  persistenceTypes,
-} from "./dataService.js";
+import { dataContext, persistenceTypes } from "./dataService.js";
 
 export class BookStore {
   constructor() {
-    this.name = "default";
+    this.name = "MyBookStore";
     this.books = [];
     this.iterator = 0;
   }
@@ -95,6 +91,7 @@ export class BookStore {
   }
 
   retrieve() {
-    this.books = dbService.retrieve(this.name);
+    let context = new dataContext();
+    this.books = context.retrieve(persistenceTypes.Cookie, this.name);
   }
 }

@@ -112,12 +112,12 @@ function updateListDisplay() {
   // create an html table element
   var bookTable =
     '<table id="book-table" width="100%">' +
-    '<tr id="header-row">' +
-    "<th>Title</th>" +
-    "<th>Author</th>" +
-    "<th>No. of Pages</th>" +
-    "<th>Date Added</th>" +
-    "<th>Actions</th>" +
+    '<tr class="table-row" id="header-row">' +
+    "<th class='table-header'>Title</th>" +
+    "<th class='table-header'>Author</th>" +
+    "<th class='table-header'>No. of Pages</th>" +
+    "<th class='table-header'>Date Added</th>" +
+    "<th class='table-header'>Actions</th>" +
     "</tr>" +
     "</table>";
 
@@ -131,6 +131,7 @@ function updateListDisplay() {
 
     // create a new table row for each book.
     var tr = document.createElement("tr");
+    tr.setAttribute("class", "table-row");
 
     // create a table cell for the title.
     var titleTd = document.createElement("td");
@@ -280,19 +281,25 @@ function displayCollection() {
 
 */
 function seedTheRepository() {
-  // create two instances of a book.
-  var bookOne = new Book("Playing to Win", "A.G. Lafley", 260);
-  var bookTwo = new Book("Everyday A Friday", "Joel Olsteen", 224);
+  bookDepot.retrieve();
 
-  // add the two books to the depot.
-  var b1 = bookDepot.addBook(bookOne);
-  var b2 = bookDepot.addBook(bookTwo);
+  if (bookDepot.books.length == 0) {
+    // create two instances of a book.
+    var bookOne = new Book("Playing to Win", "A.G. Lafley", 260);
+    var bookTwo = new Book("Everyday A Friday", "Joel Olsteen", 224);
 
-  // add a book to the depot.
-  var b3 = bookDepot.addBook(new Book("Her First Bible", "Melody Carlson", 91));
+    // add the two books to the depot.
+    var b1 = bookDepot.addBook(bookOne);
+    var b2 = bookDepot.addBook(bookTwo);
 
-  // log the activities
-  console.log(JSON.stringify(b1));
-  console.log(JSON.stringify(b2));
-  console.log(JSON.stringify(b3));
+    // add a book to the depot.
+    var b3 = bookDepot.addBook(
+      new Book("Her First Bible", "Melody Carlson", 91)
+    );
+
+    // log the activities
+    console.log(JSON.stringify(b1));
+    console.log(JSON.stringify(b2));
+    console.log(JSON.stringify(b3));
+  }
 }
