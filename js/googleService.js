@@ -2,8 +2,16 @@
 
 // NOT YET IMPLEMENTED
 // Google Service to search Google Books and provide info on titles.
+//import { GoogleConfigurationOptions } from "./googleConfiguration.js";
 
-import { GoogleConfigurationOptions } from "./googleConfiguration.js";
+//Placeholder class for implementation.
+class GoogleConfigurationOptions {
+  constructor() {
+    this.APIKeys = {
+      GoogleBooks: "xxxxxxxxxxxxxxxxxxxx",
+    };
+  }
+}
 
 export class GoogleService {
   constructor() {
