@@ -84,7 +84,6 @@ function resetForm() {
   var inputs = document.querySelectorAll(
     "input[type='text'],input[type='number']"
   );
-  console.log(inputs.length);
 
   // traditional for loop over the collection of elements.
   for (var x = 0; x <= inputs.length; x++) {
