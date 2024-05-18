@@ -1,4 +1,6 @@
-// App Interface or controller (MVC).
+// App Interface (MVC).
+
+// import necessary classes.
 import { Book } from "./book.js";
 import { BookStore } from "./bookStore.js";
 
@@ -67,11 +69,8 @@ const markUp =
       event.preventDefault();
     });
 
-  // seed the collection.
+  // seed the collection and update the display
   seedTheRepository();
-
-  // update the display
-  updateListDisplay();
 
   // clear the form
   resetForm();
@@ -99,7 +98,6 @@ function resetForm() {
   document.getElementById("new-book-id").value = 0;
 
   // set focus on the first input
-  //inputs[0].focus();
   document.getElementById("new-book-title").focus();
 }
 /*
@@ -112,7 +110,7 @@ function updateListDisplay() {
   // create an html table element
   var bookTable =
     '<table id="book-table" width="100%">' +
-    '<tr class="table-row" id="header-row">' +
+    '<tr id="header-row">' +
     "<th class='table-header'>Title</th>" +
     "<th class='table-header'>Author</th>" +
     "<th class='table-header'>No. of Pages</th>" +
@@ -277,29 +275,10 @@ function displayCollection() {
 }
 
 /*
-    Seed the repository with test data.
-
+    Seed the repository with previously stored items if any.
+    Update the display.
 */
-function seedTheRepository() {
-  bookDepot.retrieve();
-
-  if (bookDepot.books.length == 0) {
-    // create two instances of a book.
-    var bookOne = new Book("Playing to Win", "A.G. Lafley", 260);
-    var bookTwo = new Book("Everyday A Friday", "Joel Olsteen", 224);
-
-    // add the two books to the depot.
-    var b1 = bookDepot.addBook(bookOne);
-    var b2 = bookDepot.addBook(bookTwo);
-
-    // add a book to the depot.
-    var b3 = bookDepot.addBook(
-      new Book("Her First Bible", "Melody Carlson", 91)
-    );
-
-    // log the activities
-    console.log(JSON.stringify(b1));
-    console.log(JSON.stringify(b2));
-    console.log(JSON.stringify(b3));
-  }
+async function seedTheRepository() {
+  bookDepot.books = await bookDepot.retrieve();
+  updateListDisplay();
 }

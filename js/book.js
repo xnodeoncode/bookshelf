@@ -19,6 +19,7 @@ export class Book {
     return `${this.title} has ${this.numberOfPages} pages and was written by ${this.author}`;
   }
 
+  // returns the total number of pages in the book.
   totalPages() {
     return this.numberOfPages;
   }

@@ -1,124 +1,235 @@
-// this service manages an indexdb layer.
+/*
+  Service provider to manage storing collections to an indexedDB instance or cookie.
+*/
 
+// IndexedDB transaction modes.
 export const dbTransactionModes = {
   Read: "read",
   ReadWrite: "readwrite",
 };
 
+// Persistence types.
 export const persistenceTypes = {
   Cookie: "cookie",
   IndexedDB: "indexeddb",
 };
 
 export class dataContext {
-  constructor(dbName, dbVersion, objectStoreName, keyPathField) {
-    this._dbName = dbName;
-    this._dbVersion = dbVersion;
+  constructor(
+    persistenceType,
+    databaseName,
+    databaseVersion,
+    objectStoreName,
+    keyPathField
+  ) {
+    this._persistenceType = persistenceType;
+    this._databaseName = databaseName;
+    this._databaseVersion = databaseVersion;
     this._objectStoreName = objectStoreName;
     this._keyPathField = keyPathField;
-  }
-  // this process runs on page launch. the api verifies the database and version. If it doesn't exist,
-  // it is created.
-  initiateIndexDB() {
-    let request = indexedDB.open(this._dbName, this._dbVersion);
-
-    //databases and datastores (tables) are created in this callback.
-    request.onupgradeneeded = (e) => {
-      let db = e.target.result;
-
-      // create the datastore and define the key field.
-      db.createObjectStore(objectStoreName, {
-        keyPath: keyPathField,
-      }).createIndex("by_date", "date", { unique: false });
-
-      console.log(
-        `upgrade is called on database name: ${db.name} version : ${db.version}`
-      );
-    };
-
-    // the datastore can be read/viewed at during this callback.
-    request.onsuccess = (e) => {
-      let db = e.target.result;
-
-      console.log(
-        `success is called on database name: ${db.name} version : ${db.version}`
-      );
-    };
-
-    // there has been an error accessing the database or the datastore.
-    request.onerror = (e) => {
-      console.log("error");
-    };
+    this._database = null;
+    this._items = [];
   }
 
-  // read all current entries in the indexedDB
-  getEntries() {
-    // connect to the datastore
-    let tx = db
-      .transaction(this._objectStoreName)
-      .objectStore(this._objectStoreName);
+  // Create a new indexedDB database.
+  async initializeIndexDB() {
+    let request = await indexedDB.open(this._databaseName, this._databaseVersion);
 
-    // request a cursor object to hold the results
-    // onsuccess of reading the datastore, obtain the cursor object into a variable.
-    tx.openCursor().onsuccess = (e) => {
-      let cursor = e.target.result;
-      if (cursor) {
-        return cursor;
-      }
+    request.onupgradeneeded = e => {
+      this._database = e.target.result;
+
+      // Create an objectStore
+      this._database
+        .createObjectStore(this._objectStoreName, {keyPath: this._keyPathField});
     };
-  }
 
-  retrieve(persistenceType, databaseName) {
-    if (persistenceType == persistenceTypes.Cookie) {
-      let cookieData = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith(`${databaseName}=`))
-        ?.split("=")[1];
+    request.onsuccess = e => {
+      this._database = request.result;
+    };
 
-      let data = [];
-
-      if (cookieData != null && cookieData.length > 0) {
-        //let jsonString = cookieData[1];
-        data = JSON.parse(cookieData);
-      }
-
-      return data;
+    request.onerror = e => {
+      // Handle errors.
+      console.log(event.target.errorCode);
+    };
+    request.onblocked = (e) =>{
+      this._database.close();
     }
   }
 
-  // add a record to the datastore using a indexeddb transaction.
-  persist(persistenceType, databaseName, database) {
-    // set the key field value based on the current date/time.
+  //Retrieve data from persistence layer and return an array.
+  async retrieve() {
+    let data = [];
+
+    if (this._persistenceType == persistenceTypes.Cookie) {
+      let cookieData = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith(`${this._databaseName}=`))
+        ?.split("=")[1];
+
+      if (cookieData != null && cookieData.length > 0) {
+        data = JSON.parse(cookieData);
+      }
+    } else if (this._persistenceType == persistenceTypes.IndexedDB) {
+
+      let transaction = await this._database.transaction(
+        this._objectStoreName,
+        dbTransactionModes.ReadWrite
+      );
+      transaction.oncomplete = (e) => {
+        this._database.close();
+      };
+      transaction.onerror = (e) => {};
+
+      let objectStore = await transaction.objectStore(this._objectStoreName);
+      objectStore.openCursor().onsuccess = (e) => {
+        const cursor = e.target.result;
+        if (cursor) {
+          data.push(cursor.value.data);
+          cursor.continue();
+        }
+      };
+    }
+
+    return data;
+  }
+
+  //Retrieves data from persistence store and returns an array.
+  //DatabaseProperties - The properties collection that defines the data and how it is stored.
+  async retrieve(databaseProperties) {
+    let data = [];
+
+    if (databaseProperties.persistenceType == persistenceTypes.Cookie) {
+      let cookieData = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith(`${databaseProperties.databaseName}=`))
+        ?.split("=")[1];
+
+      if (cookieData != null && cookieData.length > 0) {
+        data = JSON.parse(cookieData);
+      }
+    } else if (databaseProperties.persistenceType == persistenceTypes.IndexedDB) {
+
+      let transaction = await this._db.transaction(
+        databaseProperties.objectStoreName,
+        dbTransactionModes.ReadWrite
+      );
+      transaction.oncomplete = (e) => {
+        this._db.close();
+      };
+      transaction.onerror = (e) => {};
+
+      let objectStore = await transaction.objectStore(databaseProperties.objectStoreName);
+      objectStore.openCursor().onsuccess = (e) => {
+        const cursor = e.target.result;
+        if (cursor) {
+          data.push(cursor.value.data);
+          cursor.continue();
+        }
+      };
+    }
+
+    return data;
+  }
+
+  // Saves items to the data store based on properties set in service initialization.
+  // Items-the array of objects to be saved to the data store.
+  async persist(items) {
+
+    if (this._persistenceType == persistenceTypes.Cookie) {
+      //TODO: validate size of cookie.
+      // if it is too large, fall back to indexedDB and log a message.
+      let day = 24*60*60*1000;
+      let cookieData = JSON.stringify(items);
+      let cookie = {
+        name:`${this._databaseName}`,
+        value:`${cookieData}`,
+        expires:Date.now() + day
+      }
+      cookieStore.set(cookie);
+    } else if (this._persistenceType == persistenceTypes.IndexedDB) {
+
+      // set the key field value based on the current date/time.
     // the calendar provides the post date, the time is calculated based on the current time.
     let now = new Date();
     let keyField = now.getTime();
+    let jsonData = JSON.stringify(items);
 
     // create an entry object
-    const entry = {
+    let entry = {
+      id:0,
       logdate: keyField,
-      databaseName: databaseName,
-      data: JSON.stringify(database),
+      databaseName: this._databaseName,
+      data: jsonData
     };
+      if (this._database == null) {
+        this.initializeIndexDB();
+      }
+      const transaction = await this._database.transaction(
+        this._objectStoreName,
+        dbTransactionModes.ReadWrite
+      );
+      transaction.oncomplete = (e) => {};
+      transaction.onerror = (e) => {};
 
-    if (persistenceType == persistenceTypes.Cookie) {
+      const objectStore = await transaction.objectStore(this._objectStoreName);
+      const request = objectStore.add(entry);
+
+      request.onsuccess = (e) => {};
+      request.onerror = (e) => {
+        console.log(e.target.errorCode);
+      };
+    }
+  }
+
+  // Saves items to the data store based on database properties object that is passed in.
+  // PersistenceType|Cookie: Convert array to JSON string and store it in a cookie.
+  // PersistenceType|IndexedDB: Add each element in the array to the database.
+  async persist(databaseProperties, items) {
+    
+
+    if (databaseProperties.persistenceType == persistenceTypes.Cookie) {
       //TODO: validate size of cookie.
       // if it is too large, fall back to indexedDB and log a message.
-      let dbdata = JSON.stringify(database);
-      document.cookie = `${databaseName} = ${dbdata}`;
-    } else if (persistenceType == this.persistenceTypes.indexedDB) {
-      // connect to the datastore that was created in the onupgradeneeded callback.
-      let tx = db.transaction(databaseName, dbTransactionModes.ReadWrite);
+      let day = 24*60*60*1000;
+      let cookieData = JSON.stringify(items);
+      let cookie = {
+        name:`${databaseProperties.databaseName}`,
+        value:`${cookieData}`,
+        expires:Date.now() + day
+      }
+      cookieStore.set(cookie);
+    } else if (databaseProperties.persistenceType == persistenceTypes.IndexedDB) {
 
-      // trap and respond to errors.
-      tx.onerror = (e) => console.log(`Error! ${e.target.error}`);
+      // set the key field value based on the current date/time.
+    // the calendar provides the post date, the time is calculated based on the current time.
+    let now = new Date();
+    let keyField = now.getTime();
+    let jsonData = JSON.stringify(items);
 
-      // read the datastore into memory.
-      let db = tx.objectStore(objectStoreName);
+    // create an entry object
+    let entry = {
+      id:0,
+      logdate: keyField,
+      databaseName: databaseProperties.databaseName,
+      data: jsonData
+    };
+      if (this._db == null) {
+        this.initializeIndexDB();
+      }
+      const transaction = await this._database.transaction(
+        databaseProperties.objectStoreName,
+        dbTransactionModes.ReadWrite
+      );
+      transaction.oncomplete = (e) => {};
+      transaction.onerror = (e) => {};
 
-      // add the record to the datastore.
-      db.add(entry);
+      const objectStore = await transaction.objectStore(databaseProperties.objectStoreName);
+      const request = await objectStore.add(entry);
 
-      console.log(entry.data);
+      request.onsuccess = (e) => {};
+      request.onerror = (e) => {
+        console.log(e.target.errorCode);
+      };
     }
   }
 }
