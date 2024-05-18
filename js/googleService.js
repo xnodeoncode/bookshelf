@@ -15,8 +15,8 @@ class GoogleConfigurationOptions {
 
 export class GoogleService {
   constructor() {
-    (this._apiKey = this.getAPIKey()),
-      (this._baseURL = "https://www.googleapis.com/books/v1/volumes?q=");
+    this._apiKey = this.getAPIKey();
+    this._baseURL = "https://www.googleapis.com/books/v1/volumes?q=";
     this._querySuffix = `&key=${this._apiKey}`;
     this._searchTerms = {
       Title: "intitle",
