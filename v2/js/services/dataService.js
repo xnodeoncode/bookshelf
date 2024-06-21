@@ -2,11 +2,11 @@
   Service provider to manage storing collections to an indexedDB instance or cookie.
 */
 
-import { SessionStorageService } from "./services/sessionStorageService.js";
-import { LocalStorageService } from "./services/localStorageService.js";
-import { CookieService } from "./services/cookieService.js";
+import { SessionStorageService } from "./sessionStorageService.js";
+import { LocalStorageService } from "./localStorageService.js";
+import { CookieService } from "./cookieService.js";
 
-var indexedDBServer = new Worker("./services/indexedDBService.js");
+//var indexedDBServer = new Worker("./indexedDBService.js");
 
 // IndexedDB transaction modes.
 export const TransactionModes = {

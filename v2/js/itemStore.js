@@ -1,7 +1,7 @@
 /*
     This class is a middleware controller for storing and executing changes on a collection (array) of book objects.
     Dependencies:
-        DataContext|dataService.js - provides browser persistence via indexedDB or cookies.
+        DataContext|dataService.js - provides browser persistence via various browser persistence methods.
         Book|book.js - the class definition for book objects that will be stored.
         GoogleService|googleService.js - provides search services for Google Books API to allow importing titles to the collection.
 */
@@ -9,7 +9,10 @@
 //import dependency modules.
 
 //import backend dataservices if persistence is needed.
-import { DataContext, PersistenceTypes } from "./dataService.js";
+import { DataContext, PersistenceTypes } from "./services/dataService.js";
+
+//import database settings class to capture database settings for persistence.
+import { DatabaseSettings } from "./services/databaseSettings.js";
 
 //import object type to be stored.
 import { Book } from "./book.js";
@@ -18,42 +21,22 @@ import { Book } from "./book.js";
 import {
   PersistenceServiceNotEnabled,
   DataServiceUnavailable,
-} from "./exceptions.js";
+} from "./services/exceptions.js";
 
 // not yet implemented
-import { GoogleService } from "./googleService.js";
-
-/*
-  Persistence store class with default property values. These property values can be overwritten in the implementation.
-*/
-export class DatabaseSettings {
-  constructor(
-    databaseName,
-    databaseVersion,
-    tableName,
-    keyPathField,
-    persistenceType
-  ) {
-    this.databaseName = databaseName || "Default";
-    this.databaseVersion = databaseVersion || 1;
-    this.objectStoreName = tableName || "ItemStore";
-    this.keyPathField = keyPathField || "id";
-    this.persistenceType = persistenceType || PersistenceTypes.Cookie;
-  }
-}
+import { GoogleService } from "./services/googleService.js";
 
 export class ItemStore {
   constructor(name, usePersistenceService) {
     this.name = name || "MyItemStore";
     this.books = [];
-    this.iterator = 0;
     this.usePersistenceService = usePersistenceService || false;
 
     this.dataServiceProperties = null;
 
     this.databaseDefaults = {
       databaseName: "ItemStore",
-      databaseVersion: 2,
+      databaseVersion: 1,
       objectStoreName: "Items",
       keyPathField: "id",
       persistenceType: PersistenceTypes.Cookie,

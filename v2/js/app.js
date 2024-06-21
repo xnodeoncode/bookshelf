@@ -13,14 +13,14 @@ The ItemStore module is required to manage the collection.
 The DatabaseSettings module is required to override the default persistence settings.
 See the example implementations below.
 */
-import { ItemStore, DatabaseSettings } from "./itemStore.js";
+import { ItemStore } from "./itemStore.js";
 
 /*
 Persistence types is an enum of the browser supported persistence methods.
-This module can be imported for strongly typed declarations but his is optional.
+This module can be imported for strongly typed declarations but this is optional.
 The persistence types can be passed directly as strings.
 */
-import { PersistenceTypes } from "./dataService.js";
+import { PersistenceTypes } from "./services/dataService.js";
 
 /***************************************************************************************
 Use this declaration to create a item store to manage the collection using default settings.
@@ -46,25 +46,23 @@ The collection will be stored with the browser's cookie until the cookie expires
 const bookDepot = new ItemStore("MyBookStore", true);
 
 /**************************************************************************************
-An instace of the DatabaseSettings module is required to override any of the default settings.
+An instace of the DatabaseSettings module is required to override the default settings.
 Settings such as the database name, database version, table name, as well as key field can be overridden.
 This is also where the persistence type can be changed from cookie storage to another option.
 This code is ignored when the ItemStore.usePersistence property is set to false.
 ***************************************************************************************/
 
-// Passing in values only.
-//bookDepot.initializeDataStore("MyBookStore", 1, "Books", "id", "cookie");
-
-// Using a settings object.
-var settings = new DatabaseSettings();
-
-settings.databaseName = "MyBookStore";
-settings.databaseVersion = 2;
-settings.objectStoreName = "Books";
-settings.keyPathField = "id";
-settings.persistenceType = PersistenceTypes.LocalStorage;
-
-bookDepot.initializeDataStore(settings);
+//Initialize the persistence store by passing in database settings.
+//The persistence types enum can be used for a strongly typed list of supported types.
+import { DatabaseSettings } from "./services/databaseSettings.js";
+let databaseSettings = new DatabaseSettings(
+  "MyBookStore",
+  1,
+  "Books",
+  "id",
+  PersistenceTypes.LocalStorage
+);
+bookDepot.initializeDataStore(databaseSettings);
 
 /**************************************************************************************/
 
@@ -92,7 +90,6 @@ const markUp =
   '<label for="new-book-numberOfPages" style="margin-left:8px">Page count:</label><input type="number" id="new-book-numberOfPages"  style="display:inline-block; margin-left:8px" />' +
   '<button id="new-book-form-button" type="submit"  style="display:inline-block; margin-left:8px">Save</button>' +
   '<button id="clear-form" type="reset"  style="display:inline-block; margin-left:8px">Clear</button>' +
-  '<button id="refresh-data" type="refresh"  style="display:inline-block; margin-left:8px">Refresh</button>' +
   "</form>" +
   "</fieldset>" +
   "</div>" +
@@ -131,23 +128,12 @@ const markUp =
       event.preventDefault();
     });
 
-  document
-    .getElementById("refresh-data")
-    .addEventListener("click", function (event) {
-      reloadData();
-      event.preventDefault();
-    });
-
   // seed the collection and update the display
   seedTheRepository();
 
   // clear the form
   resetForm();
 })();
-
-function reloadData() {
-  seedTheRepository();
-}
 
 /*
     Clear all form values.

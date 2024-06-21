@@ -91,3 +91,17 @@ th,
 td {
   padding: 20px;
 }
+
+button {
+  border: 0;
+  background: none;
+  box-shadow: none;
+  border-radius: 0px;
+}
+
+input[type="text"] {
+}
+
+a {
+  text-decoration: none;
+}
