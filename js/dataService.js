@@ -6,6 +6,8 @@ import { SessionStorageService } from "./services/sessionStorageService.js";
 import { LocalStorageService } from "./services/localStorageService.js";
 import { CookieService } from "./services/cookieService.js";
 
+var indexedDBServer = new Worker("./services/indexedDBService.js");
+
 // IndexedDB transaction modes.
 export const TransactionModes = {
   Read: "readonly",
