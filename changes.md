@@ -12,3 +12,7 @@
 - Moved to timestamp for ID field to avoid collisions.
 - Refactored dataService.js
 - Implemented localStorage and sessionStorage services.
+
+#### June 21, 2024
+
+- Implement versioning folders to maintain access to history.
