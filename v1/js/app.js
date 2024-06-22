@@ -1,33 +1,32 @@
-// App Interface (MVC).
+// Bookshelf App Interface (MVC).
 
-/*
-The model class can be imported for a type driven UI, but this is optional.
-The datastore does not use model properties for persistence.
-All items are added to an item collection.
-The item collection is persisted as a JSON array, regardless of the persistence type selected.
-*/
+/****************************************************************************************
+ * The model class can be imported for a type driven UI, but this is optional.
+ * The datastore does not use model properties for persistence.
+ * All items are added to an item collection.
+ * The item collection is persisted as a JSON array, regardless of the persistence type selected.
+ *****************************************************************************************/
 import { Book } from "./book.js";
 
-/*
+/****************************************************************************************
 The ItemStore module is required to manage the collection.
-The DatabaseSettings module is required to override the default persistence settings.
-See the example implementations below.
-*/
+*****************************************************************************************/
 import { ItemStore } from "./itemStore.js";
 
 /***************************************************************************************
 Use this declaration to create a item store to manage the collection using default settings.
 The collection will be in memory only and deleted upon page refresh or when the browser window is closed.
 ****************************************************************************************/
-
 const bookDepot = new ItemStore();
 
-/**************************************************************************************/
-
-// new page title
+/**************************************************************************************
+ * New page title
+ **************************************************************************************/
 const pageTitle = "Javascript - Bookshelf";
 
-// HTML markup to display the book collection.
+/***************************************************************************************
+ * HTML markup to display the book collection.
+ ***************************************************************************************/
 const markUp =
   "<header>" +
   "<h1>Bookshelf</h1>" +
@@ -60,7 +59,9 @@ const markUp =
   "</div>" +
   "</div>";
 
-// initialize the page.
+/*********************************************************************************
+ * initialize the page.
+ **********************************************************************************/
 (function () {
   // set page title
   document.title = pageTitle;
@@ -93,9 +94,9 @@ const markUp =
   resetForm();
 })();
 
-/*
-    Clear all form values.
-*/
+/*********************************************************************************
+ * Clear all form values.
+ ********************************************************************************/
 function resetForm() {
   // get all inputs
   var inputs = document.querySelectorAll(
@@ -116,9 +117,10 @@ function resetForm() {
   // set focus on the first input
   document.getElementById("new-book-title").focus();
 }
-/*
-    Update book list display
-*/
+
+/**********************************************************************************
+ * Update book list display
+ ***********************************************************************************/
 function updateListDisplay() {
   // access the book container
   var bookList = document.getElementById("book-list");
@@ -212,9 +214,9 @@ function updateListDisplay() {
   }
 }
 
-/*
-    Save a new book from the form values. This could be pushed back to the book depot, but I kind of like it sitting in this "controller".
-*/
+/**************************************************************************************
+ * Save a new book using form values.
+ ***************************************************************************************/
 function saveBook() {
   // get values from the html input elements.
   let title = document.getElementById("new-book-title").value;
@@ -254,9 +256,9 @@ function saveBook() {
   resetForm();
 }
 
-/*
-    Delete a book from the repository
-*/
+/*****************************************************************************************
+ * Delete a book from the repository
+ ******************************************************************************************/
 function deleteBook(bookId) {
   // remove the book by id.
   var b = bookDepot.removeBookById(bookId);
@@ -268,9 +270,9 @@ function deleteBook(bookId) {
   console.log(JSON.stringify(b));
 }
 
-/*
-    Update a single book
-*/
+/*****************************************************************************************
+ * Update a single book
+ ******************************************************************************************/
 function updateBook(bookId) {
   // find the book to be updated
   var book = bookDepot.getBookById(bookId);
@@ -282,18 +284,16 @@ function updateBook(bookId) {
   document.getElementById("new-book-id").value = book.id;
 }
 
-/*
-    Output all of the contents of the repository object to the console.
-*/
+/*****************************************************************************************
+ * Output the contents of the repository object to the console.
+ ******************************************************************************************/
 function displayCollection() {
-  // display the repository in the console.
   console.log(bookDepot);
 }
 
-/*
-    Seed the repository with previously stored items if any.
-    Update the display.
-*/
+/******************************************************************************************
+ * Seed the repository and update the display.
+ ******************************************************************************************/
 async function seedTheRepository() {
   var b1 = new Book("Every Day a Friday", "Joel Olsteen", 250);
   var b2 = new Book("Playing to Win", "A.G. Lafley", 820);
@@ -305,8 +305,8 @@ async function seedTheRepository() {
 
   bookDepot.addBook(b1);
 
-  // this is a hack to prevent race conditions where multiple items may have the same id.
-  // should probably be handled by the itemStore.
+  //This is a hack to prevent race conditions where multiple items may have the same id.
+  //There could be another implementation.
   wait(0.5)
     .then(() => {
       bookDepot.addBook(b2);
@@ -319,7 +319,10 @@ async function seedTheRepository() {
     });
 }
 
-// wait time expects seconds, which are converted to milliseconds.
+/*********************************************************************************************
+ * Simulates a delay.
+ * Promise which expects seconds, which are converted to milliseconds.
+ **********************************************************************************************/
 function wait(time) {
   return new Promise((resolve) => setTimeout(resolve, time * 1000));
 }
