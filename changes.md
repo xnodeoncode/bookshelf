@@ -16,3 +16,8 @@
 #### June 21, 2024
 
 - Implement versioning folders to maintain access to history.
+
+#### June 22, 2024
+
+- Code cleanup - removed unused artifacts and completed documentation.
+- Implemented StorageItem class.
