@@ -8,22 +8,18 @@ The item collection is persisted as a JSON array, regardless of the persistence 
 */
 import { Book } from "./book.js";
 
-/*
+/***************************************************************************************
 The ItemStore module is required to manage the collection.
-The DatabaseSettings module is required to override the default persistence settings.
-See the example implementations below.
-*/
+***************************************************************************************/
 import { ItemStore } from "./itemStore.js";
 
 /***************************************************************************************
 Use this declaration to create a item store to manage the collection using default settings.
 The collection will be in memory only and deleted upon page refresh or when the browser window is closed.
 ****************************************************************************************/
-
 const bookDepot = new ItemStore();
 
 /**************************************************************************************/
-
 // new page title
 const pageTitle = "Javascript - Bookshelf";
 
