@@ -54,7 +54,7 @@ const markUp =
   "</div>" +
   '<div class="row">' +
   '<div class="col" style="margin-top:50px">' +
-  '<div id="book-list">' +
+  '<div id="book-list"><div style="margin:auto; text-align:center; padding:90px;">Loading...</div>' +
   "</div>" +
   "</div>" +
   "</div>" +
@@ -302,8 +302,24 @@ async function seedTheRepository() {
     "Reldan S. Nadler",
     540
   );
+
   bookDepot.addBook(b1);
-  bookDepot.addBook(b2);
-  bookDepot.addBook(b3);
-  updateListDisplay();
+
+  // this is a hack to prevent race conditions where multiple items may have the same id.
+  // should probably be handled by the itemStore.
+  wait(0.5)
+    .then(() => {
+      bookDepot.addBook(b2);
+    })
+    .then(() => {
+      wait(0.5).then(() => {
+        bookDepot.addBook(b3);
+        updateListDisplay();
+      });
+    });
+}
+
+// wait time expects seconds, which are converted to milliseconds.
+function wait(time) {
+  return new Promise((resolve) => setTimeout(resolve, time * 1000));
 }
