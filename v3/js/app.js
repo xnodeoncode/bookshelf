@@ -20,7 +20,7 @@ import { ItemStore } from "./itemStore.js";
  * This module can be imported for strongly typed declarations but this is optional.
  * The persistence types can be passed directly as strings.
  ************************************************************************************/
-import { PersistenceTypes } from "./services/dataService.js";
+import { PersistenceTypes } from "./services/persistenceTypes.js";
 
 /*************************************************************************************
  * The DatabaseSettings class can be used to override the default persistence settings.
@@ -39,11 +39,10 @@ import { DatabaseSettings } from "./services/databaseSettings.js";
 
 /*************************************************************************************
  * Use this declaration to create a item store to manage the collection without persistence.
- * When the usePersistenceStore parameter is set to false,
- * the collection will be in memory only and deleted upon page refresh or
- * when the browser window is closed.
+ * When the usePersistenceStore parameter is set to false, the collection is stored
+ * in memory only and deleted upon page refresh or when the browser window is closed.
  *************************************************************************************/
-//const bookDepot = new ItemStore("MyBookStore", false);
+//const bookDepot = new ItemStore(false);
 
 /**************************************************************************************
  * Use this declaration to create an item store to manage the collection with
@@ -52,7 +51,7 @@ import { DatabaseSettings } from "./services/databaseSettings.js";
  * The collection will be stored with the browser's cookie until the cookie expires or
  * is deleted.
  **************************************************************************************/
-const bookDepot = new ItemStore("MyBookStore", true);
+const bookDepot = new ItemStore(true);
 
 /***************************************************************************************
  * An instace of the DatabaseSettings module is required to override the default settings.
@@ -71,7 +70,7 @@ let databaseSettings = new DatabaseSettings(
   "id",
   PersistenceTypes.LocalStorage
 );
-bookDepot.initializeDataStore(databaseSettings);
+bookDepot.createDataStore(databaseSettings);
 
 /**************************************************************************************
  * New page title

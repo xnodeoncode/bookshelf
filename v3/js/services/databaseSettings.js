@@ -14,9 +14,9 @@ export class DatabaseSettings {
     keyPathField,
     persistenceType
   ) {
-    this.databaseName = databaseName || "Default";
+    this.databaseName = databaseName || "ItemStore";
     this.databaseVersion = databaseVersion || 1;
-    this.objectStoreName = tableName || "ItemStore";
+    this.objectStoreName = tableName || "Items";
     this.keyPathField = keyPathField || "id";
     this.persistenceType = persistenceType || PersistenceTypes.Cookie;
   }

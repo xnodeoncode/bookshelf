@@ -4,6 +4,11 @@
  *************************************************************************************/
 
 /*************************************************************************************
+ * Import the IndexedDB service in order to persist to indexedDB.
+ ************************************************************************************/
+import { IndexedDBService } from "./indexedDBService.js";
+
+/*************************************************************************************
  * Import the SessionStorage service in order to persist to window.sessionStorage.
  ************************************************************************************/
 import { SessionStorageService } from "./sessionStorageService.js";
@@ -24,14 +29,9 @@ import { CookieService } from "./cookieService.js";
 import { StorageItem } from "./storageItem.js";
 
 /*************************************************************************************
- * PeristenceTypes provides a strongly typed interface to the types of persistence
- * services that are available to the application.
+ * Import PersistenceTypes class for a strongly typed object.
  ************************************************************************************/
-export const PersistenceTypes = {
-  Cookie: "cookie",
-  SessionStorage: "session",
-  LocalStorage: "localstorage",
-};
+import { PersistenceTypes } from "./persistenceTypes.js";
 
 /*************************************************************************************
  * The DataContext class definition.
@@ -41,22 +41,9 @@ export const PersistenceTypes = {
  * objectStoreName: The name of the specific object store being used.
  * keyPathField: The object's field or property that will be used for key values.
  ************************************************************************************/
-export class DataContext {
-  constructor(
-    persistenceType,
-    databaseName,
-    databaseVersion,
-    objectStoreName,
-    keyPathField
-  ) {
-    this._persistenceType = persistenceType;
-    this._databaseName = databaseName;
-    this._databaseVersion = databaseVersion;
-    this._objectStoreName = objectStoreName;
-    this._keyPathField = keyPathField;
-    this._database = null;
-    this._items = [];
-    this._iterator = 0;
+export class DataService {
+  constructor(databaseSettings) {
+    this._databaseSettings = databaseSettings;
   }
 
   /*************************************************************************************
@@ -70,22 +57,32 @@ export class DataContext {
       //retrieve from cookie service
       case PersistenceTypes.Cookie:
         let cookieService = new CookieService();
-        storageItem = cookieService.retrieve(this._databaseName);
+        storageItem = cookieService.retrieve(
+          this._databaseSettings.databaseName
+        );
         if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
 
       //retrieve from localStorage service
       case PersistenceTypes.LocalStorage:
-        var localStorageService = new LocalStorageService();
-        storageItem = localStorageService.retrieve(this._databaseName);
+        let localStorageService = new LocalStorageService();
+        storageItem = localStorageService.retrieve(
+          this._databaseSettings.databaseName
+        );
         if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
 
       //retrieve from sessionStorage service
       case PersistenceTypes.SessionStorage:
-        var sessionStorageService = new SessionStorageService();
-        storageItem = sessionStorageService.retrieve(this._databaseName);
+        let sessionStorageService = new SessionStorageService();
+        storageItem = sessionStorageService.retrieve(
+          this._databaseSettings.databaseName
+        );
         if (storageItem != null) data = JSON.parse(storageItem.Value);
+        break;
+
+      //retrieve from indexedDB service
+      case PersistenceTypes.IndexedDB:
         break;
 
       default:
@@ -98,34 +95,39 @@ export class DataContext {
    * Retrieves data from persistence store and returns an array.
    * DatabaseProperties: The database settings to be used when storing the items.
    ************************************************************************************/
-  async retrieve(databaseProperties) {
+  async retrieve(databaseSettings) {
     let data = [];
     let storageItem = new StorageItem();
 
-    switch (databaseProperties.persistenceType) {
+    switch (databaseSettings.persistenceType) {
       //retrieve from cookie service
       case PersistenceTypes.Cookie:
         let cookieService = new CookieService();
-        storageItem = cookieService.retrieve(databaseProperties.databaseName);
+        storageItem = cookieService.retrieve(databaseSettings.databaseName);
         if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
 
       //retrieve from LocalStorage service
       case PersistenceTypes.LocalStorage:
-        var localStorageService = new LocalStorageService();
+        let localStorageService = new LocalStorageService();
         storageItem = localStorageService.retrieve(
-          databaseProperties.databaseName
+          databaseSettings.databaseName
         );
         if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
 
       //retrieve from sessionStorage service
       case PersistenceTypes.SessionStorage:
-        var sessionStorageService = new SessionStorageService();
+        let sessionStorageService = new SessionStorageService();
         storageItem = sessionStorageService.retrieve(
-          databaseProperties.databaseName
+          databaseSettings.databaseName
         );
         if (storageItem != null) data = JSON.parse(storageItem.Value);
+        break;
+
+      //retrieve from indexedDB service
+      case PersistenceTypes.IndexedDB:
+        let indexedDBService = new IndexedDBService();
         break;
 
       default:
@@ -145,19 +147,25 @@ export class DataContext {
       case PersistenceTypes.Cookie:
         let cookieService = new CookieService();
         let cookieData = JSON.stringify(items);
-        cookieService.save(this._databaseName, cookieData);
+        cookieService.save(this.databaseSettings.databaseName, cookieData);
         break;
 
       //persist to LocalStorage service
       case PersistenceTypes.LocalStorage:
-        var localStorageService = new LocalStorageService();
+        let localStorageService = new LocalStorageService();
         localStorageService.save(this._database, JSON.stringify(items));
         break;
 
       //persist to sessionStorage service
       case PersistenceTypes.SessionStorage:
-        var sessionStorageService = new SessionStorageService();
+        let sessionStorageService = new SessionStorageService();
         sessionStorageService.save(this._database, JSON.stringify(items));
+        break;
+
+      //persist to indexedDB service
+      case PersistenceTypes.IndexedDB:
+        let indexedDBService = new IndexedDBService();
+        indexedDBService.save(null, items);
         break;
 
       default:
@@ -170,31 +178,37 @@ export class DataContext {
    * DatabaseProperties: The database settings to be used when storing the items.
    * Items: The array of objects or values to be stored.
    ************************************************************************************/
-  async persist(databaseProperties, items) {
-    switch (databaseProperties.persistenceType) {
+  async persist(databaseSettings, items) {
+    switch (databaseSettings.persistenceType) {
       //persist to Cookie service
       case PersistenceTypes.Cookie:
         let cookieService = new CookieService();
         let cookieData = JSON.stringify(items);
-        cookieService.save(databaseProperties.databaseName, cookieData);
+        cookieService.save(databaseSettings.databaseName, cookieData);
         break;
 
       //persist to LocalStorage service
       case PersistenceTypes.LocalStorage:
-        var localStorageService = new LocalStorageService();
+        let localStorageService = new LocalStorageService();
         localStorageService.save(
-          databaseProperties.databaseName,
+          databaseSettings.databaseName,
           JSON.stringify(items)
         );
         break;
 
       //persist to sessionStorage service
       case PersistenceTypes.SessionStorage:
-        var sessionStorageService = new SessionStorageService();
+        let sessionStorageService = new SessionStorageService();
         sessionStorageService.save(
-          databaseProperties.databaseName,
+          databaseSettings.databaseName,
           JSON.stringify(items)
         );
+        break;
+
+      //persist to indexedDB service
+      case PersistenceTypes.IndexedDB:
+        let indexedDBService = new IndexedDBService();
+        indexedDBService.save(databaseSettings, items);
         break;
 
       default:

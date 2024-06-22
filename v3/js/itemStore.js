@@ -14,7 +14,14 @@ import { Book } from "./book.js";
 /***********************************************************************
  * Import backend dataservices if persistence is needed.
  ***********************************************************************/
-import { DataContext, PersistenceTypes } from "./services/dataService.js";
+import { DataService } from "./services/dataService.js";
+
+/*************************************************************************************
+ * Persistence types is an enum of the browser supported persistence methods.
+ * This module can be imported for strongly typed declarations but this is optional.
+ * The persistence types can be passed directly as strings.
+ ************************************************************************************/
+import { PersistenceTypes } from "./services/persistenceTypes.js";
 
 /***********************************************************************
  * import DatabaseSettings class to capture database settings for persistence.
@@ -35,78 +42,27 @@ import {
  * UsePersistenceService|bool: Whether or not persistence should be enabled.
  ***********************************************************************/
 export class ItemStore {
-  constructor(name, usePersistenceService) {
-    this.name = name || "MyItemStore";
+  constructor(usePersistence) {
+    this.name = "ItemStore";
     this.books = [];
-    this.usePersistenceService = usePersistenceService || false;
-
-    this.dataServiceProperties = null;
-
-    this.databaseDefaults = {
-      databaseName: this.name || "ItemStore",
-      databaseVersion: 1,
-      objectStoreName: "Items",
-      keyPathField: "id",
-      persistenceType: PersistenceTypes.Cookie,
-    };
-
-    // initialize data store with default settings.
-    if (usePersistenceService) {
-      this.dataContext = this.initializeDataStore();
-    }
+    this.usePersistence = usePersistence || false;
+    this.databaseSettings = new DatabaseSettings(
+      this.name,
+      1,
+      "Items",
+      "id",
+      PersistenceTypes.Cookie
+    );
+    this.dataContext = this.createDataStore(this.databaseSettings);
   }
 
   /***********************************************************************
    * Initializes the database using the DatabaseSettings object.
    * DatabaseSettings|object: Class containing values for database options.
    ***********************************************************************/
-  initializeDataStore(databaseSettings) {
-    if (this.usePersistenceService) {
-      let settings = {};
-
-      if (
-        typeof databaseSettings === "undefined" ||
-        databaseSettings === null ||
-        databaseSettings === ""
-      ) {
-        settings = {
-          databaseName: this.databaseDefaults.databaseName,
-          databaseVersion: this.databaseDefaults.databaseVersion,
-          objectStoreName: this.databaseDefaults.objectStoreName,
-          keyPathField: this.databaseDefaults.keyPathField,
-          persistenceType: this.databaseDefaults.persistenceType,
-        };
-      } else {
-        settings = {
-          databaseName:
-            databaseSettings.databaseName || this.databaseDefaults.databaseName,
-          databaseVersion:
-            databaseSettings.databaseVersion ||
-            this.databaseDefaults.databaseVersion,
-          objectStoreName:
-            databaseSettings.tableName || this.databaseDefaults.objectStoreName,
-          keyPathField:
-            databaseSettings.keyPathField || this.databaseDefaults.keyPathField,
-          persistenceType:
-            databaseSettings.persistenceType ||
-            this.databaseDefaults.persistenceType,
-        };
-      }
-
-      this.dataServiceProperties = new DatabaseSettings(
-        settings.databaseName,
-        settings.databaseVersion,
-        settings.objectStoreName,
-        settings.keyPathField,
-        settings.persistenceType
-      );
-      this.dataContext = this.getDataStore(this.dataServiceProperties);
-    } else {
-      var e = new PersistenceServiceNotEnabled(
-        "The persistence service is not enabled. Set usePersistenceService = true on the ItemStore."
-      );
-      console.log(e);
-    }
+  createDataStore(databaseSettings) {
+    this.databaseSettings = databaseSettings;
+    this.dataContext = this.getDataStore(databaseSettings);
   }
 
   /***********************************************************************
@@ -272,11 +228,11 @@ export class ItemStore {
    * Saves the collection to storage.
    ***********************************************************************/
   async persist() {
-    if (this.usePersistenceService) {
+    if (this.usePersistence) {
       // if the data service doesn't exist, try to create one.
       if (this.dataContext == null) {
         try {
-          this.dataContext = this.getDataStore(this.dataServiceProperties);
+          this.dataContext = this.getDataStore(this.databaseSettings);
         } catch (error) {
           throw new DataServiceUnavailable(
             "Error: Data service unavailable. Unable to persist data."
@@ -285,7 +241,7 @@ export class ItemStore {
       }
 
       // asynchronous call to store the array.
-      await this.dataContext.persist(this.dataServiceProperties, this.books);
+      await this.dataContext.persist(this.databaseSettings, this.books);
 
       // get the latest version of the collection.
       this.books = await this.retrieve();
@@ -299,13 +255,13 @@ export class ItemStore {
    * Retrieves the collection from storage.
    ***********************************************************************/
   async retrieve() {
-    if (this.usePersistenceService) {
+    if (this.usePersistence) {
       // if the data service does not exist, create it.
       if (this.dataContext == null)
-        this.dataContext = this.getDataStore(this.dataServiceProperties);
+        this.dataContext = this.getDataStore(this.databaseSettings);
 
       // get the latest version of the books collection
-      var items = await this.dataContext.retrieve(this.dataServiceProperties);
+      var items = await this.dataContext.retrieve(this.databaseSettings);
       if (items.length > 0) {
         this.books = items;
       }
@@ -319,18 +275,13 @@ export class ItemStore {
    * Creates an instance of the data context to manage persistence.
    * DatabaseProperties|object: Class containing values for database options.
    ***********************************************************************/
-  getDataStore(databaseProperties) {
-    if (this.usePersistenceService) {
+  getDataStore(databaseSettings) {
+    try {
       // create a new instance of the data service and return it.
-      let context = new DataContext(
-        databaseProperties.persistenceType,
-        databaseProperties.databaseName,
-        databaseProperties.databaseVersion,
-        databaseProperties.objectStoreName,
-        databaseProperties.keyPathField
-      );
+      let context = new DataService(databaseSettings);
       return context;
+    } catch (e) {
+      throw e;
     }
-    return {};
   }
 }
