@@ -1,31 +1,39 @@
-/*
-    This class is a middleware controller for storing and executing changes on a collection (array) of book objects.
-    Dependencies:
-        DataContext|dataService.js - provides browser persistence via various browser persistence methods.
-        Book|book.js - the class definition for book objects that will be stored.
-        GoogleService|googleService.js - provides search services for Google Books API to allow importing titles to the collection.
-*/
+/***********************************************************************
+ * This class is a middleware controller for storing and executing
+ * changes on a collection (array) of book objects.
+ * Dependencies:
+ *    DataContext|dataService.js - provides browser persistence via various browser persistence methods.
+ *    Book|book.js - the class definition for book objects that will be stored.
+ ***********************************************************************/
 
-//import dependency modules.
-
-//import backend dataservices if persistence is needed.
-import { DataContext, PersistenceTypes } from "./services/dataService.js";
-
-//import database settings class to capture database settings for persistence.
-import { DatabaseSettings } from "./services/databaseSettings.js";
-
-//import object type to be stored.
+/***********************************************************************
+ * Import object type to be stored.
+ ***********************************************************************/
 import { Book } from "./book.js";
 
-// import exception classes
+/***********************************************************************
+ * Import backend dataservices if persistence is needed.
+ ***********************************************************************/
+import { DataContext, PersistenceTypes } from "./services/dataService.js";
+
+/***********************************************************************
+ * import DatabaseSettings class to capture database settings for persistence.
+ ***********************************************************************/
+import { DatabaseSettings } from "./services/databaseSettings.js";
+
+/***********************************************************************
+ * Import custom exception classes
+ ***********************************************************************/
 import {
   PersistenceServiceNotEnabled,
   DataServiceUnavailable,
 } from "./services/exceptions.js";
 
-// not yet implemented
-import { GoogleService } from "./services/googleService.js";
-
+/***********************************************************************
+ * Class definition
+ * Name|string: The name of the item store.
+ * UsePersistenceService|bool: Whether or not persistence should be enabled.
+ ***********************************************************************/
 export class ItemStore {
   constructor(name, usePersistenceService) {
     this.name = name || "MyItemStore";
@@ -35,7 +43,7 @@ export class ItemStore {
     this.dataServiceProperties = null;
 
     this.databaseDefaults = {
-      databaseName: "ItemStore",
+      databaseName: this.name || "ItemStore",
       databaseVersion: 1,
       objectStoreName: "Items",
       keyPathField: "id",
@@ -48,6 +56,10 @@ export class ItemStore {
     }
   }
 
+  /***********************************************************************
+   * Initializes the database using the DatabaseSettings object.
+   * DatabaseSettings|object: Class containing values for database options.
+   ***********************************************************************/
   initializeDataStore(databaseSettings) {
     if (this.usePersistenceService) {
       let settings = {};
@@ -97,25 +109,44 @@ export class ItemStore {
     }
   }
 
+  /***********************************************************************
+   * Sets/Resets the name of the item store.
+   * Name|string: The name of the item store.
+   ***********************************************************************/
   name(name) {
     this.name = name;
   }
 
+  /***********************************************************************
+   * Returns the collection of items.
+   ***********************************************************************/
   getBooks() {
     return this.books;
   }
 
+  /***********************************************************************
+   * Generates an id based on the timestamp.
+   ***********************************************************************/
   generateId() {
     let id = Date.now();
     return id;
   }
 
-  getBookById(bookId) {
-    bookId = parseInt(bookId);
-    let book = this.books.find((b) => b.id == bookId);
+  /***********************************************************************
+   * Finds an item by its Id.
+   * Returns: An item from the collection.
+   * Id|Int: The id of the item.
+   ***********************************************************************/
+  getBookById(id) {
+    id = parseInt(id);
+    let book = this.books.find((b) => b.id == id);
     return book;
   }
 
+  /***********************************************************************
+   * Adds a new item to the collection.
+   * Book|object: The item that will be added to the collection.
+   ***********************************************************************/
   addBook(book) {
     // parse book id
     book.id = book.id == 0 ? this.generateId() : book.id;
@@ -134,6 +165,10 @@ export class ItemStore {
     return this.log(book, ` ${book.title} has been added.`);
   }
 
+  /***********************************************************************
+   * Updates an item in the collection.
+   * Book|object: The item that will be updated.
+   ***********************************************************************/
   updateBook(book) {
     // remove the existing intance of the book
     this.removeBook(book);
@@ -152,6 +187,10 @@ export class ItemStore {
     return this.log(book, ` ${book.title} has been updated.`);
   }
 
+  /***********************************************************************
+   * Removes an item from the collection.
+   * Book|object: The item that will be removed.
+   ***********************************************************************/
   removeBook(book) {
     // find the existing book
     book.id = parseInt(book.id);
@@ -169,10 +208,14 @@ export class ItemStore {
     return this.log(book, ` ${book.title} has been removed.`);
   }
 
-  removeBookById(bookId) {
+  /***********************************************************************
+   * Removes an item from the collection.
+   * Id|int: The id of the item that will be removed.
+   ***********************************************************************/
+  removeBookById(id) {
     // find the existing book
-    bookId = parseInt(bookId);
-    let b = this.books.find((item) => item.id == bookId);
+    id = parseInt(id);
+    let b = this.books.find((item) => item.id == id);
 
     //filter the book from the array.
     this.books = this.books.filter((o) => o.id !== b.id);
@@ -180,7 +223,7 @@ export class ItemStore {
     // sort the remaining books by title.
     this.sort();
 
-    //this method takes an integer (bookId) and not an object.
+    //this method takes an integer (id) and not an object.
     //create an instance of the book to get access to methods.
     let b2 = new Book(b.title, b.author, b.numberOfPages);
 
@@ -191,9 +234,9 @@ export class ItemStore {
     return this.log(b2, ` ${b2.title} has been removed by ID.`);
   }
 
-  /*
-    Sort the array by book title.
-    */
+  /***********************************************************************
+   * Sorts the collection by title.
+   ***********************************************************************/
   sort() {
     let sorted = this.books.sort((a, b) => {
       if (a.title < b.title) {
@@ -209,9 +252,11 @@ export class ItemStore {
     this.books = sorted;
   }
 
-  /*
-    Logs activity to the console
-  */
+  /***********************************************************************
+   * Logs activity to the console.
+   * Book|object: The item that has been modified.
+   * Message|string: The message to display.
+   ***********************************************************************/
   log(book, message) {
     // log details of the book.
     console.log(book.getDetails());
@@ -223,26 +268,9 @@ export class ItemStore {
     return { book, message };
   }
 
-  /*
-    NOT YET IMPLEMENTED
-    Search Google Books for a title.
-  */
-  async search(term) {
-    let result = {};
-    try {
-      let googleService = new GoogleService();
-      result = await googleService.search(term);
-      return result;
-    } catch (e) {
-      console.log(e);
-      result.Error = "Service unavailable";
-      return result;
-    }
-  }
-
-  /*
-    Save book collection (array) to a cookie or indexedDB.
-  */
+  /***********************************************************************
+   * Saves the collection to storage.
+   ***********************************************************************/
   async persist() {
     if (this.usePersistenceService) {
       // if the data service doesn't exist, try to create one.
@@ -267,9 +295,9 @@ export class ItemStore {
     return this.books;
   }
 
-  /*
-    Retrieve book collection from cookie or indexedDB.
-  */
+  /***********************************************************************
+   * Retrieves the collection from storage.
+   ***********************************************************************/
   async retrieve() {
     if (this.usePersistenceService) {
       // if the data service does not exist, create it.
@@ -287,9 +315,10 @@ export class ItemStore {
     return this.books;
   }
 
-  /*
-    Create an instance of the data service to manage persistence.
-  */
+  /***********************************************************************
+   * Creates an instance of the data context to manage persistence.
+   * DatabaseProperties|object: Class containing values for database options.
+   ***********************************************************************/
   getDataStore(databaseProperties) {
     if (this.usePersistenceService) {
       // create a new instance of the data service and return it.

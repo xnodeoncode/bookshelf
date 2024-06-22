@@ -1,10 +1,22 @@
+/********************************************************************
+ * Import StorageItem class for a strongly typed storage object.
+ ********************************************************************/
 import { StorageItem } from "./storageItem.js";
 
+/********************************************************************
+ * Session storage wrapper to provide access to window.sessionStorage
+ * if it's available.
+ ********************************************************************/
 export class SessionStorageService {
   constructor() {
     this._storageAvailable = this.storageAvailable("sessionStorage");
   }
 
+  /*****************************************************************
+   * Add an item to window.sessionStorage.
+   * StorageItemName|string: The name of the item being stored.
+   * StorageItemValue|object: The value being stored.
+   ****************************************************************/
   save(storageItemName, storageItemValue) {
     if (this._storageAvailable) {
       window.sessionStorage.setItem(storageItemName, storageItemValue);
@@ -13,12 +25,30 @@ export class SessionStorageService {
     }
   }
 
+  /*****************************************************************
+   * Retrieve an item from window.sessionStorage.
+   * StorageItemName|string: The name of the item to be retrieved.
+   ****************************************************************/
   retrieve(storageItemName) {
+    let item = null;
+
     if (this._storageAvailable) {
-      return window.sessionStorage.getItem(storageItemName);
+      if (storageItemName.length > 0) {
+        let storedValue = window.sessionStorage.getItem(storageItemName);
+        if (storedValue != null) {
+          item = new StorageItem(storageItemName, storedValue);
+        }
+      }
+    } else {
+      console.log("Session storage is not available.");
     }
+    return item;
   }
 
+  /*****************************************************************
+   * Remove an item from window.sessionStorage.
+   * StorageItemName|string: The name of the item to be removed.
+   ****************************************************************/
   remove(storageItemName) {
     if (this._storageAvailable) {
       window.sessionStorage.removeItem(storageItemName);
@@ -27,6 +57,9 @@ export class SessionStorageService {
     }
   }
 
+  /*****************************************************************
+   * Clear all items from window.sessionStorage.
+   ****************************************************************/
   clear() {
     if (this._storageAvailable) {
       window.sessionStorage.clear();
@@ -35,7 +68,10 @@ export class SessionStorageService {
     }
   }
 
-  /***********************************************************************************
+  /**********************************************************************************
+   * Checks for window.localStorage or window.sessionStorage.
+   * Type|string: The name of the storage type being tested.
+   * Reference:
    * Storage avaialability test taken from MDN Web Docs
    * https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
    ***********************************************************************************/
