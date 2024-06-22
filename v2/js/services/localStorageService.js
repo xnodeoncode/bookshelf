@@ -1,33 +1,54 @@
+/********************************************************************
+ * Import StorageItem class for a strongly typed storage object.
+ ********************************************************************/
 import { StorageItem } from "./storageItem.js";
 
+/********************************************************************
+ * Session storage wrapper to provide access to window.localStorage
+ * if it's available.
+ ********************************************************************/
 export class LocalStorageService {
   constructor() {
     this._storageAvailable = this.storageAvailable("localStorage");
   }
 
-  save(storageItemName, storageValue) {
+  /*****************************************************************
+   * Add an item to window.localStorage.
+   * StorageItemName|string: The name of the item being stored.
+   * StorageItemValue|object: The value being stored.
+   ****************************************************************/
+  save(storageItemName, storageItemValue) {
     if (this._storageAvailable) {
-      let storageItem = new StorageItem(storageItemName, storageValue);
-      window.localStorage.setItem(storageItem.Name, storageItem.Value);
+      window.localStorage.setItem(storageItemName, storageItemValue);
     } else {
       console.log("Local storage is not available.");
     }
   }
 
+  /*****************************************************************
+   * Retrieve an item from window.localStorage.
+   * StorageItemName|string: The name of the item to be retrieved.
+   ****************************************************************/
   retrieve(storageItemName) {
-    let item = new StorageItem();
+    let item = null;
 
     if (this._storageAvailable) {
       if (storageItemName.length > 0) {
-        item = window.localStorage.getItem(storageItemName);
+        let storedValue = window.localStorage.getItem(storageItemName);
+        if (storedValue != null) {
+          item = new StorageItem(storageItemName, storedValue);
+        }
       }
     } else {
       console.log("Local storage is not available.");
     }
-
     return item;
   }
 
+  /*****************************************************************
+   * Remove an item from window.localStorage.
+   * StorageItemName|string: The name of the item to be removed.
+   ****************************************************************/
   remove(storageItemName) {
     if (this._storageAvailable) {
       if (storageItemName.length > 0) {
@@ -38,6 +59,9 @@ export class LocalStorageService {
     }
   }
 
+  /*****************************************************************
+   * Clear all items from window.localStorage.
+   ****************************************************************/
   clear() {
     if (this._storageAvailable) {
       window.localStorage.clear();
@@ -47,6 +71,9 @@ export class LocalStorageService {
   }
 
   /***********************************************************************************
+   * Checks for window.localStorage or window.sessionStorage.
+   * Type|string: The name of the storage type being tested.
+   * Reference:
    * Storage avaialability test taken from MDN Web Docs
    * https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
    ***********************************************************************************/

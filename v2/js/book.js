@@ -1,3 +1,9 @@
+/***********************************************************************
+ * Book class
+ * Title|string: The book title.
+ * Author|string: The book's author.
+ * NumberOfPages|int: The number of pages in the book.
+ ***********************************************************************/
 export class Book {
   constructor(title, author, numberOfPages) {
     this.id = 0;
@@ -8,18 +14,24 @@ export class Book {
     this.modifiedOn = this.getDate();
   }
 
-  // get current date as a locale string
+  /***********************************************************************
+   * Gets current date as a locale string
+   ***********************************************************************/
   getDate() {
     let today = new Date();
     return today.toLocaleDateString();
   }
 
-  // Returns book details to the.
+  /***********************************************************************
+   * Returns|string: Book details.
+   ***********************************************************************/
   getDetails() {
     return `${this.title} has ${this.numberOfPages} pages and was written by ${this.author}`;
   }
 
-  // returns the total number of pages in the book.
+  /***********************************************************************
+   * Returns|int: The total number of pages in the book.
+   ***********************************************************************/
   totalPages() {
     return this.numberOfPages;
   }

@@ -1,29 +1,46 @@
-/*
-  Service provider to manage storing collections to an indexedDB instance or cookie.
-*/
+/*************************************************************************************
+ * Service provider to manage storing values to various data stores using custom
+ * services.
+ *************************************************************************************/
 
+/*************************************************************************************
+ * Import the SessionStorage service in order to persist to window.sessionStorage.
+ ************************************************************************************/
 import { SessionStorageService } from "./sessionStorageService.js";
+
+/*************************************************************************************
+ * Import the LocalStorage service in order to persist to window.localStorage.
+ ************************************************************************************/
 import { LocalStorageService } from "./localStorageService.js";
+
+/*************************************************************************************
+ * Import the CookieStorage service in order to persist to document.cookie.
+ ************************************************************************************/
 import { CookieService } from "./cookieService.js";
 
-//var indexedDBServer = new Worker("./indexedDBService.js");
+/*************************************************************************************
+ * Import StorageItem class for a strongly typed storage object.
+ ************************************************************************************/
+import { StorageItem } from "./storageItem.js";
 
-// IndexedDB transaction modes.
-export const TransactionModes = {
-  Read: "readonly",
-  ReadWrite: "readwrite",
-  Flush: "readwriteflush",
-};
-
-// Persistence types.
+/*************************************************************************************
+ * PeristenceTypes provides a strongly typed interface to the types of persistence
+ * services that are available to the application.
+ ************************************************************************************/
 export const PersistenceTypes = {
   Cookie: "cookie",
-  IndexedDB: "indexeddb",
   SessionStorage: "session",
   LocalStorage: "localstorage",
-  BlockChain: "blockchain",
 };
 
+/*************************************************************************************
+ * The DataContext class definition.
+ * persistenceType: The persistenceType to be used for storage.
+ * databaseName: The name for the database.
+ * databaseVersion: The version of the database to be used.
+ * objectStoreName: The name of the specific object store being used.
+ * keyPathField: The object's field or property that will be used for key values.
+ ************************************************************************************/
 export class DataContext {
   constructor(
     persistenceType,
@@ -42,95 +59,33 @@ export class DataContext {
     this._iterator = 0;
   }
 
-  // Create a new indexedDB database.
-  async initializeIndexDB() {
-    let request = await indexedDB.open(
-      this._databaseName,
-      this._databaseVersion
-    );
-    request.onupgradeneeded = (e) => {
-      this._database = e.target.result;
-
-      try {
-        // Create an objectStore
-        this._database
-          .createObjectStore(this._objectStoreName, {
-            keyPath: this._keyPathField,
-          })
-          .createIndex("by_id", "id", { unique: true });
-      } catch (e) {
-        console.log(e);
-      }
-    };
-
-    request.onsuccess = (e) => {
-      this._database = e.target.result;
-      this._database.onversionchange = () => {
-        this._database.close();
-        console.log("version changed.");
-      };
-    };
-
-    request.onerror = (e) => {
-      // Handle errors.
-      console.log(e);
-    };
-    request.onblocked = (e) => {
-      this._database.close();
-    };
-  }
-
-  //Retrieve data from persistence layer and return an array.
+  /*************************************************************************************
+   * Retrieves data from persistence layer and returns an array.
+   ************************************************************************************/
   async retrieve() {
     let data = [];
+    let storageItem = new StorageItem();
 
     switch (this._persistenceType) {
       //retrieve from cookie service
       case PersistenceTypes.Cookie:
         let cookieService = new CookieService();
-        let cookieData = cookieService.retrieve(this._databaseName);
-        if (cookieData !== null && cookieData.length > 0) {
-          data = JSON.parse(cookieData);
-        }
-        break;
-
-      //retrieve from indexedDB service
-      case PersistenceTypes.indexedDB:
-        if (typeof this._database === "undefined" || this._database === null) {
-          this.initializeIndexDB();
-        }
-
-        let transaction = await this._database.transaction(
-          this._objectStoreName,
-          TransactionModes.Read
-        );
-
-        let objectStore = await transaction.objectStore(this._objectStoreName);
-        objectStore.openCursor().onsuccess = (e) => {
-          const cursor = e.target.result;
-          if (cursor) {
-            data.push(cursor.value);
-            cursor.continue();
-          }
-        };
+        storageItem = cookieService.retrieve(this._databaseName);
+        if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
 
       //retrieve from localStorage service
       case PersistenceTypes.LocalStorage:
         var localStorageService = new LocalStorageService();
-        var items = localStorageService.retrieve(this._databaseName);
-        data = JSON.parse(items);
+        storageItem = localStorageService.retrieve(this._databaseName);
+        if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
 
       //retrieve from sessionStorage service
       case PersistenceTypes.SessionStorage:
         var sessionStorageService = new SessionStorageService();
-        var items = sessionStorageService.retrieve(this._databaseName);
-        data = JSON.parse(items);
-        break;
-
-      //retrieve from blockchain service
-      case PersistenceTypes.BlockChain:
+        storageItem = sessionStorageService.retrieve(this._databaseName);
+        if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
 
       default:
@@ -139,72 +94,40 @@ export class DataContext {
     return data;
   }
 
-  //Retrieves data from persistence store and returns an array.
-  //DatabaseProperties - The properties collection that defines the data and how it is stored.
+  /*************************************************************************************
+   * Retrieves data from persistence store and returns an array.
+   * DatabaseProperties: The database settings to be used when storing the items.
+   ************************************************************************************/
   async retrieve(databaseProperties) {
     let data = [];
+    let storageItem = new StorageItem();
 
     switch (databaseProperties.persistenceType) {
       //retrieve from cookie service
       case PersistenceTypes.Cookie:
         let cookieService = new CookieService();
-        let cookieData = cookieService.retrieve(
-          databaseProperties.databaseName
-        );
-        if (cookieData !== null && cookieData.length > 0) {
-          data = JSON.parse(cookieData);
-        }
-        break;
-
-      //retrieve from indexedDB service
-      case PersistenceTypes.IndexedDB:
-        if (typeof this._database === "undefined" || this._database === null) {
-          await this.initializeIndexDB();
-        }
-
-        try {
-          let transaction = await this._database
-            .transaction(databaseProperties.objectStoreName)
-            .objectStore(databaseProperties.objectStoreName);
-
-          transaction.openCursor().onsuccess = (e) => {
-            let cursor = e.target.result;
-            if (cursor) {
-              data.push(cursor.value);
-              cursor.continue();
-            }
-          };
-          return data;
-        } catch (e) {
-          console.log(e);
-        }
+        storageItem = cookieService.retrieve(databaseProperties.databaseName);
+        if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
 
       //retrieve from LocalStorage service
       case PersistenceTypes.LocalStorage:
         var localStorageService = new LocalStorageService();
-        var items = localStorageService.retrieve(
+        storageItem = localStorageService.retrieve(
           databaseProperties.databaseName
         );
-        if (items !== null) {
-          data = JSON.parse(items);
-        }
+        if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
 
       //retrieve from sessionStorage service
       case PersistenceTypes.SessionStorage:
         var sessionStorageService = new SessionStorageService();
-        var items = sessionStorageService.retrieve(
+        storageItem = sessionStorageService.retrieve(
           databaseProperties.databaseName
         );
-        if (items !== null) {
-          data = JSON.parse(items);
-        }
+        if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
 
-      //retrieve from blockchain service
-      case PersistenceTypes.BlockChain:
-        break;
       default:
         break;
     }
@@ -212,8 +135,10 @@ export class DataContext {
     return data;
   }
 
-  // Saves items to the data store based on properties set in service initialization.
-  // Items-the array of objects to be saved to the data store.
+  /*************************************************************************************
+   * Saves items to the data store based on properties set in service initialization.
+   * Items: The array of objects or values to be stored.
+   ************************************************************************************/
   async persist(items) {
     switch (this._persistenceType) {
       //persist to Cookie service
@@ -221,25 +146,6 @@ export class DataContext {
         let cookieService = new CookieService();
         let cookieData = JSON.stringify(items);
         cookieService.save(this._databaseName, cookieData);
-        break;
-
-      //persist to IndexedDB service.
-      case PersistenceTypes.indexedDB:
-        if (typeof this._database === "undefined" || this._database === null) {
-          await this.initializeIndexDB();
-        }
-        let transaction = await this._database.transaction(
-          this._objectStoreName,
-          TransactionModes.ReadWrite
-        );
-        transaction.oncomplete = (e) => {};
-        transaction.onerror = (e) => {};
-
-        let objectTable = await transaction.objectStore(this._objectStoreName);
-
-        for (i = 0; i <= items.length; i++) {
-          let request = await objectTable.put(items[i]);
-        }
         break;
 
       //persist to LocalStorage service
@@ -254,17 +160,16 @@ export class DataContext {
         sessionStorageService.save(this._database, JSON.stringify(items));
         break;
 
-      //persist to blockchain service
-      case PersistenceTypes.BlockChain:
-        break;
       default:
         break;
     }
   }
 
-  // Saves items to the data store based on database properties object that is passed in.
-  // PersistenceType|Cookie: Convert array to JSON string and store it in a cookie.
-  // PersistenceType|IndexedDB: Add each element in the array to the database.
+  /*************************************************************************************
+   * Saves items to the data store based on database properties object that is passed in.
+   * DatabaseProperties: The database settings to be used when storing the items.
+   * Items: The array of objects or values to be stored.
+   ************************************************************************************/
   async persist(databaseProperties, items) {
     switch (databaseProperties.persistenceType) {
       //persist to Cookie service
@@ -272,25 +177,6 @@ export class DataContext {
         let cookieService = new CookieService();
         let cookieData = JSON.stringify(items);
         cookieService.save(databaseProperties.databaseName, cookieData);
-        break;
-
-      //persist to IndexedDB service.
-      case PersistenceTypes.indexedDB:
-        if (typeof this._database === "undefined" || this._database === null) {
-          this.initializeIndexDB();
-        }
-        const transaction = await this._database.transaction(
-          databaseProperties.objectStoreName,
-          TransactionModes.ReadWrite
-        );
-
-        const objectStore = await transaction.objectStore(
-          databaseProperties.objectStoreName
-        );
-
-        for (var i = 0; i < items.length; i++) {
-          const request = await objectStore.put(items[i]);
-        }
         break;
 
       //persist to LocalStorage service
@@ -311,9 +197,6 @@ export class DataContext {
         );
         break;
 
-      //persist to blockchain service
-      case PersistenceTypes.BlockChain:
-        break;
       default:
         break;
     }

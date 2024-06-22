@@ -1,60 +1,69 @@
-// App Interface (MVC).
+// Bookshelf App Interface (MVC).
 
-/*
-The model class can be imported for a type driven UI, but this is optional.
-The datastore does not use model properties for persistence.
-All items are added to an item collection.
-The item collection is persisted as a JSON array, regardless of the persistence type selected.
-*/
+/************************************************************************************
+ * The model class can be imported for a type driven UI, but this is optional.
+ * The datastore does not use model properties for persistence.
+ * All items are added to an item collection.
+ * The item collection is persisted as a JSON array, regardless of the persistence type selected.
+ ***********************************************************************************/
 import { Book } from "./book.js";
 
-/*
-The ItemStore module is required to manage the collection.
-The DatabaseSettings module is required to override the default persistence settings.
-See the example implementations below.
-*/
+/************************************************************************************
+ * The ItemStore module is required to manage the collection.
+ * The DatabaseSettings module is required to override the default persistence settings.
+ * See the example implementations below.
+ ************************************************************************************/
 import { ItemStore } from "./itemStore.js";
 
-/*
-Persistence types is an enum of the browser supported persistence methods.
-This module can be imported for strongly typed declarations but this is optional.
-The persistence types can be passed directly as strings.
-*/
+/*************************************************************************************
+ * Persistence types is an enum of the browser supported persistence methods.
+ * This module can be imported for strongly typed declarations but this is optional.
+ * The persistence types can be passed directly as strings.
+ ************************************************************************************/
 import { PersistenceTypes } from "./services/dataService.js";
 
-/***************************************************************************************
-Use this declaration to create a item store to manage the collection using default settings.
-The collection will be in memory only and deleted upon page refresh or when the browser window is closed.
-****************************************************************************************/
+/*************************************************************************************
+ * The DatabaseSettings class can be used to override the default persistence settings.
+ * Properties such as database name, key field, and persistence type can all be
+ * customized using valid options.
+ *************************************************************************************/
+import { DatabaseSettings } from "./services/databaseSettings.js";
 
+/*************************************************************************************
+ * Use this declaration to create a item store to manage the collection
+ * using default settings.
+ * The collection will be in memory only and deleted upon page refresh or
+ * when the browser window is closed.
+ ************************************************************************************/
 //const bookDepot = new ItemStore();
 
 /*************************************************************************************
-Use this declaration to create a item store to manage the collection without persistence.
-When the usePersistenceStore parameter is set to false,
-the collection will be in memory only and deleted upon page refresh or when the browser window is closed.
-*************************************************************************************/
-
+ * Use this declaration to create a item store to manage the collection without persistence.
+ * When the usePersistenceStore parameter is set to false,
+ * the collection will be in memory only and deleted upon page refresh or
+ * when the browser window is closed.
+ *************************************************************************************/
 //const bookDepot = new ItemStore("MyBookStore", false);
 
-/*************************************************************************************
-Use this declaration to create an item store to manage the collection with default persistence settings.
-This implementation will use cookie storage by default.
-The collection will be stored with the browser's cookie until the cookie expires or is deleted.
-**************************************************************************************/
-
+/**************************************************************************************
+ * Use this declaration to create an item store to manage the collection with
+ * default persistence settings.
+ * This implementation will use cookie storage by default.
+ * The collection will be stored with the browser's cookie until the cookie expires or
+ * is deleted.
+ **************************************************************************************/
 const bookDepot = new ItemStore("MyBookStore", true);
 
-/**************************************************************************************
-An instace of the DatabaseSettings module is required to override the default settings.
-Settings such as the database name, database version, table name, as well as key field can be overridden.
-This is also where the persistence type can be changed from cookie storage to another option.
-This code is ignored when the ItemStore.usePersistence property is set to false.
-***************************************************************************************/
+/***************************************************************************************
+ * An instace of the DatabaseSettings module is required to override the default settings.
+ * Settings such as the database name, database version, table name, as well as key field
+ * can be overridden.
+ * This is also where the persistence type can be changed from cookie storage to another option.
+ * This code is ignored when the ItemStore.usePersistence property is set to false.
+ ***************************************************************************************/
 
-//Initialize the persistence store by passing in database settings.
+//Initialize the data store by passing in a DatabaseSettings object.
 //The persistence types enum can be used for a strongly typed list of supported types.
-import { DatabaseSettings } from "./services/databaseSettings.js";
 let databaseSettings = new DatabaseSettings(
   "MyBookStore",
   1,
@@ -64,12 +73,14 @@ let databaseSettings = new DatabaseSettings(
 );
 bookDepot.initializeDataStore(databaseSettings);
 
-/**************************************************************************************/
-
-// new page title
+/**************************************************************************************
+ * New page title
+ **************************************************************************************/
 const pageTitle = "Javascript - Bookshelf";
 
-// HTML markup to display the book collection.
+/***************************************************************************************
+ * HTML markup to display the book collection.
+ ***************************************************************************************/
 const markUp =
   "<header>" +
   "<h1>Bookshelf</h1>" +
@@ -102,7 +113,9 @@ const markUp =
   "</div>" +
   "</div>";
 
-// initialize the page.
+/**********************************************************************************
+ * initialize the page.
+ **********************************************************************************/
 (function () {
   // set page title
   document.title = pageTitle;
@@ -135,9 +148,9 @@ const markUp =
   resetForm();
 })();
 
-/*
-    Clear all form values.
-*/
+/********************************************************************************
+ * Clear all form values.
+ ********************************************************************************/
 function resetForm() {
   // get all inputs
   var inputs = document.querySelectorAll(
@@ -158,9 +171,10 @@ function resetForm() {
   // set focus on the first input
   document.getElementById("new-book-title").focus();
 }
-/*
-    Update book list display
-*/
+
+/***********************************************************************************
+ * Update book list display
+ ***********************************************************************************/
 function updateListDisplay() {
   // access the book container
   var bookList = document.getElementById("book-list");
@@ -254,9 +268,9 @@ function updateListDisplay() {
   }
 }
 
-/*
-    Save a new book from the form values. This could be pushed back to the book depot, but I kind of like it sitting in this "controller".
-*/
+/***************************************************************************************
+ * Save a new book using form values.
+ ***************************************************************************************/
 function saveBook() {
   // get values from the html input elements.
   let title = document.getElementById("new-book-title").value;
@@ -296,9 +310,10 @@ function saveBook() {
   resetForm();
 }
 
-/*
-    Delete a book from the repository
-*/
+/******************************************************************************************
+ * Delete a book from the repository
+ * bookId|int: The id for the item to be deleted.
+ ******************************************************************************************/
 function deleteBook(bookId) {
   // remove the book by id.
   var b = bookDepot.removeBookById(bookId);
@@ -310,9 +325,10 @@ function deleteBook(bookId) {
   console.log(JSON.stringify(b));
 }
 
-/*
-    Update a single book
-*/
+/******************************************************************************************
+ * Update book.
+ * bookId|int: The id of the book to be updated.
+ ******************************************************************************************/
 function updateBook(bookId) {
   // find the book to be updated
   var book = bookDepot.getBookById(bookId);
@@ -324,18 +340,17 @@ function updateBook(bookId) {
   document.getElementById("new-book-id").value = book.id;
 }
 
-/*
-    Output all of the contents of the repository object to the console.
-*/
+/******************************************************************************************
+ * Output the contents of the repository object to the console.
+ ******************************************************************************************/
 function displayCollection() {
   // display the repository in the console.
   console.log(bookDepot);
 }
 
-/*
-    Seed the repository with previously stored items if any.
-    Update the display.
-*/
+/******************************************************************************************
+ * Load any existing items from the repository and update the display.
+ ******************************************************************************************/
 async function seedTheRepository() {
   bookDepot.books = await bookDepot.retrieve();
   updateListDisplay();
