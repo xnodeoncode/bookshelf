@@ -9,14 +9,14 @@
 import { Book } from "./book.js";
 
 /****************************************************************************************
-The ItemStore module is required to manage the collection.
-*****************************************************************************************/
+ * The ItemStore module is required to manage the collection.
+ *****************************************************************************************/
 import { ItemStore } from "./itemStore.js";
 
 /***************************************************************************************
-Use this declaration to create a item store to manage the collection using default settings.
-The collection will be in memory only and deleted upon page refresh or when the browser window is closed.
-****************************************************************************************/
+ * Use this declaration to create a item store to manage the collection using default settings.
+ * The collection will be in memory only and deleted upon page refresh or when the browser window is closed.
+ ****************************************************************************************/
 const bookDepot = new ItemStore();
 
 /**************************************************************************************
