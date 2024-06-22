@@ -1,8 +1,8 @@
 /*******************************************************************************************************************
-    This class is a middleware controller for storing and executing changes on a collection (array) of objects.
-    Dependencies:
-        Book|book.js - the class definition for book objects that will be stored.
-********************************************************************************************************************/
+ * This class is a middleware controller for storing and executing changes on a collection (array) of objects.
+ * Dependencies:
+ *    Book|book.js - the class definition for book objects that will be stored.
+ ********************************************************************************************************************/
 
 /**********************************************************************
  * Import object type to be stored.
@@ -126,8 +126,8 @@ export class ItemStore {
   }
 
   /***************************************************************************
-    Sort the collection by title.
-  ****************************************************************************/
+   * Sort the collection by title.
+   ****************************************************************************/
   sort() {
     let sorted = this.books.sort((a, b) => {
       if (a.title < b.title) {
@@ -144,8 +144,8 @@ export class ItemStore {
   }
 
   /****************************************************************************
-    Logs activity to the console
-  *****************************************************************************/
+   * Logs activity to the console
+   *****************************************************************************/
   log(book, message) {
     // log details of the book.
     console.log(book.getDetails());
