@@ -1,7 +1,7 @@
 /********************************************************************
- * Import StorageItem class for a strongly typed storage object.
+ * Import DatabaseSettings class for a strongly typed settings object.
  ********************************************************************/
-import { StorageItem } from "./storageItem.js";
+import { DatabaseSettings } from "./databaseSettings.js";
 
 /********************************************************************
  * IndexedDB transaction modes.
@@ -17,131 +17,145 @@ export const TransactionModes = {
  ********************************************************************/
 export class IndexedDBService {
   constructor(databaseSettings) {
-    this._databaseSettings = databaseSettings;
-    this._database = null;
-    this._databaseName = "";
-    this._databaseVersion = 1;
-    this._objectStoreName = "Items";
+    this._database;
+    this._objectStore;
+
+    this._databaseSettings = new DatabaseSettings(
+      databaseSettings.databaseName,
+      databaseSettings.databaseVersion,
+      databaseSettings.tableName,
+      databaseSettings.keyPathField,
+      databaseSettings.persistenceType
+    );
+
+    //initialize the database.
+    this.initializeIndexDB();
   }
 
   /********************************************************************
    * Initialize the database.
    ********************************************************************/
   async initializeIndexDB() {
-    let request = await indexedDB.open(
-      this._databaseName,
-      this._databaseVersion
-    );
-    request.onupgradeneeded = (e) => {
-      this._database = e.target.result;
+    if (this._database == null) {
+      let request = await indexedDB.open(
+        this._databaseSettings.databaseName,
+        this._databaseSettings.databaseVersion
+      );
 
-      try {
-        // Create an objectStore
-        this._database
-          .createObjectStore(this._objectStoreName, {
-            keyPath: this._keyPathField,
-          })
-          .createIndex("by_id", "id", { unique: true });
-      } catch (e) {
-        console.log(e);
-      }
-    };
-
-    request.onsuccess = (e) => {
-      this._database = e.target.result;
-      this._database.onversionchange = () => {
-        this._database.close();
-        console.log("version changed.");
+      request.onsuccess = (e) => {
+        this._database = e.target.result;
+        console.log("Success: Database exists", this._database);
       };
-    };
 
-    request.onerror = (e) => {
-      // Handle errors.
-      console.log(e);
-    };
-    request.onblocked = (e) => {
-      this._database.close();
-    };
+      request.onupgradeneeded = (e) => {
+        this._database = e.target.result;
+
+        //if the table does not exist, create it.
+        if (
+          !this._database.objectStoreNames.contains(
+            this._databaseSettings.tableName
+          )
+        ) {
+          //create the table (objectstore).
+          this._objectStore = this._database.createObjectStore(
+            this._databaseSettings.tableName,
+            { keyPath: this._databaseSettings.keyPathField }
+          );
+
+          // create an index based on the keypathfield.
+          this._objectStore.createIndex(
+            this._databaseSettings.keyPathField,
+            this._databaseSettings.keyPathField,
+            {
+              unique: true,
+            }
+          );
+        }
+
+        console.log("Database created / upgraded", this._database);
+      };
+
+      request.onerror = (e) => {
+        console.warn("Error opening database.", e);
+      };
+      request.onblocked = (e) => {
+        console.warn("Database request blocked.", e);
+      };
+    }
   }
 
-  async retrieve(databaseProperties) {
+  /********************************************************************
+   * Returns an IndexedDB Transaction object.
+   ********************************************************************/
+  async getTransaction() {
+    return await this._database.transaction(
+      this._databaseSettings.tableName,
+      TransactionModes.ReadWrite
+    );
+  }
+
+  /********************************************************************
+   * Returns|Array: All records in the table.
+   ********************************************************************/
+  async retrieve() {
     let data = [];
 
-    if (databaseProperties == null) {
-      if (typeof this._database === "undefined" || this._database === null) {
-        this.initializeIndexDB();
-      }
+    if (this._database != null) {
+      let transaction = await this.getTransaction();
 
-      let transaction = await this._database.transaction(
-        this._objectStoreName,
-        TransactionModes.Read
+      this._objectStore = await transaction.objectStore(
+        this._databaseSettings.tableName
       );
 
-      let objectStore = await transaction.objectStore(this._objectStoreName);
-      objectStore.openCursor().onsuccess = (e) => {
-        const cursor = e.target.result;
-        if (cursor) {
-          data.push(cursor.value);
-          cursor.continue();
-        }
+      let request = await this._objectStore.getAll();
+      request.onsuccess = (e) => {
+        let requestItems = e.target.result;
+        requestItems.forEach((item) => {
+          data.push(item);
+        });
+        console.log({ requestItems }, { data });
       };
-    } else {
-      if (typeof this._database === "undefined" || this._database === null) {
-        await this.initializeIndexDB();
-      }
 
-      try {
-        let transaction = await this._database
-          .transaction(databaseProperties.objectStoreName)
-          .objectStore(databaseProperties.objectStoreName);
+      transaction.oncomplete = (e) => {
+        console.log("read success", e);
+      };
 
-        transaction.openCursor().onsuccess = (e) => {
-          let cursor = e.target.result;
-          if (cursor) {
-            data.push(cursor.value);
-            cursor.continue();
-          }
-        };
-        return data;
-      } catch (e) {
-        console.log(e);
-      }
+      transaction.onerror = (e) => {
+        console.warn("read error", e);
+      };
     }
+
+    return data;
   }
 
-  async save(databaseProperties, items) {
-    if (databaseProperties == null) {
-      if (typeof this._database === "undefined" || this._database === null) {
-        await this.initializeIndexDB();
-      }
-      let transaction = await this._database.transaction(
-        this._objectStoreName,
-        TransactionModes.ReadWrite
-      );
-      transaction.oncomplete = (e) => {};
-      transaction.onerror = (e) => {};
+  /********************************************************************
+   * Adds a new record to the table.
+   * Items|Array: An array of items that will be added to or updated in the table.
+   ********************************************************************/
+  async save(items) {
+    // get transaction.
+    let transaction = await this.getTransaction();
 
-      let objectTable = await transaction.objectStore(this._objectStoreName);
+    // get object store.
+    let store = await transaction.objectStore(this._databaseSettings.tableName);
 
-      for (i = 0; i <= items.length; i++) {
-        let request = await objectTable.put(items[i]);
-      }
-    } else {
-      if (typeof this._database === "undefined" || this._database === null) {
-        this.initializeIndexDB();
-      }
-      const transaction = await this._database.transaction(
-        databaseProperties.objectStoreName,
-        TransactionModes.ReadWrite
-      );
+    // add/update items in the table.
+    items.forEach((item) => {
+      let request = store.put(item);
+      request.onsuccess = (e) => {
+        console.log("Item added", item);
+      };
+      request.onerror = (e) => {
+        console.warn("error, item NOT saved", e);
+      };
+    });
 
-      const objectStore = await transaction.objectStore(
-        databaseProperties.objectStoreName
-      );
+    transaction.oncomplete = (e) => {
+      console.log("complete, save transaction complete", e);
+    };
 
-      for (var i = 0; i < items.length; i++) {
-        const request = await objectStore.put(items[i]);
-      }
-    }
+    transaction.onerror = (e) => {
+      console.warn("error, saved transaction failed", e);
+    };
   }
 }

@@ -16,8 +16,8 @@ export class DatabaseSettings {
   ) {
     this.databaseName = databaseName || "ItemStore";
     this.databaseVersion = databaseVersion || 1;
-    this.objectStoreName = tableName || "Items";
+    this.tableName = tableName || "Items";
     this.keyPathField = keyPathField || "id";
-    this.persistenceType = persistenceType || PersistenceTypes.Cookie;
+    this.persistenceType = persistenceType || "cookie";
   }
 }

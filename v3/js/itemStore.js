@@ -43,17 +43,29 @@ import {
  ***********************************************************************/
 export class ItemStore {
   constructor(usePersistence) {
-    this.name = "ItemStore";
+    //database defaults
+    this.defaultDatabaseName = "ItemStore";
+    this.defaultTableName = "Items";
+    this.defaultDatabaseVersion = 1;
+    this.defaultDatabaseKeyField = "id";
+    this.defaultPersistenceType = PersistenceTypes.Cookie;
+
+    // other fields
     this.books = [];
     this.usePersistence = usePersistence || false;
-    this.databaseSettings = new DatabaseSettings(
-      this.name,
-      1,
-      "Items",
-      "id",
-      PersistenceTypes.Cookie
-    );
-    this.dataContext = this.createDataStore(this.databaseSettings);
+    this.databaseSettings = null;
+    this.dataContext = null;
+
+    // Set database settings to default.
+    if (this.usePersistence) {
+      this.databaseSettings = new DatabaseSettings(
+        this.defaultDatabaseName,
+        this.defaultDatabaseVersion,
+        this.defaultTableName,
+        this.defaultDatabaseKeyField,
+        this.defaultPersistenceType
+      );
+    }
   }
 
   /***********************************************************************
@@ -61,7 +73,13 @@ export class ItemStore {
    * DatabaseSettings|object: Class containing values for database options.
    ***********************************************************************/
   createDataStore(databaseSettings) {
-    this.databaseSettings = databaseSettings;
+    this.databaseSettings = new DatabaseSettings(
+      databaseSettings.databaseName,
+      databaseSettings.databaseVersion,
+      databaseSettings.tableName,
+      databaseSettings.keyPathField,
+      databaseSettings.persistenceType
+    );
     this.dataContext = this.getDataStore(databaseSettings);
   }
 
@@ -70,7 +88,7 @@ export class ItemStore {
    * Name|string: The name of the item store.
    ***********************************************************************/
   name(name) {
-    this.name = name;
+    this.defaultDatabaseName = name;
   }
 
   /***********************************************************************

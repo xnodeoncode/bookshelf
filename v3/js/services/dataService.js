@@ -43,9 +43,13 @@ import { PersistenceTypes } from "./persistenceTypes.js";
  ************************************************************************************/
 export class DataService {
   constructor(databaseSettings) {
-    this._databaseSettings = databaseSettings;
+    try {
+      this._databaseSettings = databaseSettings;
+    } catch (e) {
+      throw e;
+    }
+    this._indexedDBService = new IndexedDBService(this._databaseSettings);
   }
-
   /*************************************************************************************
    * Retrieves data from persistence layer and returns an array.
    ************************************************************************************/
@@ -83,6 +87,7 @@ export class DataService {
 
       //retrieve from indexedDB service
       case PersistenceTypes.IndexedDB:
+        data = await this._indexedDBService.retrieve();
         break;
 
       default:
@@ -127,7 +132,7 @@ export class DataService {
 
       //retrieve from indexedDB service
       case PersistenceTypes.IndexedDB:
-        let indexedDBService = new IndexedDBService();
+        data = await this._indexedDBService.retrieve();
         break;
 
       default:
@@ -164,8 +169,7 @@ export class DataService {
 
       //persist to indexedDB service
       case PersistenceTypes.IndexedDB:
-        let indexedDBService = new IndexedDBService();
-        indexedDBService.save(null, items);
+        await this._indexedDBService.save(items);
         break;
 
       default:
@@ -207,8 +211,7 @@ export class DataService {
 
       //persist to indexedDB service
       case PersistenceTypes.IndexedDB:
-        let indexedDBService = new IndexedDBService();
-        indexedDBService.save(databaseSettings, items);
+        await this._indexedDBService.save(items);
         break;
 
       default:

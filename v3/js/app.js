@@ -64,11 +64,11 @@ const bookDepot = new ItemStore(true);
 //Initialize the data store by passing in a DatabaseSettings object.
 //The persistence types enum can be used for a strongly typed list of supported types.
 let databaseSettings = new DatabaseSettings(
-  "MyBookStore",
+  "MyBookShelf",
   1,
   "Books",
   "id",
-  PersistenceTypes.LocalStorage
+  PersistenceTypes.IndexedDB
 );
 bookDepot.createDataStore(databaseSettings);
 
@@ -100,6 +100,7 @@ const markUp =
   '<label for="new-book-numberOfPages" style="margin-left:8px">Page count:</label><input type="number" id="new-book-numberOfPages"  style="display:inline-block; margin-left:8px" />' +
   '<button id="new-book-form-button" type="submit"  style="display:inline-block; margin-left:8px">Save</button>' +
   '<button id="clear-form" type="reset"  style="display:inline-block; margin-left:8px">Clear</button>' +
+  '<button id="reload-data" type="button"  style="display:inline-block; margin-left:8px">Refresh List</button>' +
   "</form>" +
   "</fieldset>" +
   "</div>" +
@@ -140,6 +141,12 @@ const markUp =
       event.preventDefault();
     });
 
+  document
+    .getElementById("reload-data")
+    .addEventListener("click", function (event) {
+      seedTheRepository();
+    });
+
   // seed the collection and update the display
   seedTheRepository();
 
@@ -151,18 +158,8 @@ const markUp =
  * Clear all form values.
  ********************************************************************************/
 function resetForm() {
-  // get all inputs
-  var inputs = document.querySelectorAll(
-    "input[type='text'],input[type='number']"
-  );
-
-  // traditional for loop over the collection of elements.
-  for (var x = 0; x <= inputs.length; x++) {
-    var element = inputs[x];
-    if (element) {
-      element.value = "";
-    }
-  }
+  //reset the form.
+  document.forms[0].reset();
 
   // set new book id to 0.
   document.getElementById("new-book-id").value = 0;
