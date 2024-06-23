@@ -35,9 +35,9 @@ export class IndexedDBService {
   /********************************************************************
    * Initialize the database.
    ********************************************************************/
-  async initializeIndexDB() {
+  initializeIndexDB() {
     if (this._database == null) {
-      let request = await indexedDB.open(
+      let request = indexedDB.open(
         this._databaseSettings.databaseName,
         this._databaseSettings.databaseVersion
       );
@@ -141,11 +141,11 @@ export class IndexedDBService {
 
     // add/update items in the table.
     items.forEach((item) => {
-      let request = store.put(item);
-      request.onsuccess = (e) => {
+      let addRequest = store.put(item);
+      addRequest.onsuccess = (e) => {
         console.log("Item added", item);
       };
-      request.onerror = (e) => {
+      addRequest.onerror = (e) => {
         console.warn("error, item NOT saved", e);
       };
     });
