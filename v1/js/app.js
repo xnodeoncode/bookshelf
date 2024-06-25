@@ -8,7 +8,6 @@
  *****************************************************************************************/
 import { Book } from "./book.js";
 
-
 /****************************************************************************************
  * The ItemStore module is required to manage the collection.
  *****************************************************************************************/
@@ -179,14 +178,14 @@ function updateListDisplay() {
     tr.appendChild(actionsTD);
 
     // create link to update the book.
-    var a = document.createElement("a");
-    a.setAttribute("href", "#");
-    a.setAttribute("id", "u-" + book.id);
-    a.setAttribute("data-book-id", book.id);
-    a.setAttribute("data-action", "update");
-    a.innerHTML = "<span>update</span>";
-    actionsTD.appendChild(a);
-    a.addEventListener("click", function (event) {
+    var editLink = document.createElement("a");
+    editLink.setAttribute("href", "#");
+    editLink.setAttribute("id", "u-" + book.id);
+    editLink.setAttribute("data-book-id", book.id);
+    editLink.setAttribute("data-action", "update");
+    editLink.innerHTML = "<span>update</span>";
+    actionsTD.appendChild(editLink);
+    editLink.addEventListener("click", function (event) {
       updateBook(this.dataset.bookId);
       event.preventDefault();
     });
@@ -197,14 +196,14 @@ function updateListDisplay() {
     actionsTD.appendChild(s);
 
     // create link to delete the book.
-    var a = document.createElement("a");
-    a.setAttribute("href", "#");
-    a.setAttribute("id", "d-" + book.id);
-    a.setAttribute("data-book-id", book.id);
-    a.setAttribute("data-action", "delete");
-    a.innerHTML = "<span>delete</span>";
-    actionsTD.appendChild(a);
-    a.addEventListener("click", function (event) {
+    var deleteLink = document.createElement("a");
+    deleteLink.setAttribute("href", "#");
+    deleteLink.setAttribute("id", "d-" + book.id);
+    deleteLink.setAttribute("data-book-id", book.id);
+    deleteLink.setAttribute("data-action", "delete");
+    deleteLink.innerHTML = "<span>delete</span>";
+    actionsTD.appendChild(deleteLink);
+    deleteLink.addEventListener("click", function (event) {
       deleteBook(this.dataset.bookId);
       event.preventDefault();
     });
