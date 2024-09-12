@@ -1,3 +1,4 @@
+/* eslint-disable no-dupe-class-members */
 /*************************************************************************************
  * Service provider to manage storing values to various data stores using custom
  * services.
@@ -46,6 +47,7 @@ export class DataService {
     try {
       this._databaseSettings = databaseSettings;
     } catch (e) {
+      console.log(e);
       throw e;
     }
     this._indexedDBService = new IndexedDBService(this._databaseSettings);
@@ -59,36 +61,55 @@ export class DataService {
 
     switch (this._persistenceType) {
       //retrieve from cookie service
-      case PersistenceTypes.Cookie:
+      case PersistenceTypes.Cookie: {
         let cookieService = new CookieService();
         storageItem = cookieService.retrieve(
           this._databaseSettings.databaseName
         );
         if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
+      }
 
       //retrieve from localStorage service
-      case PersistenceTypes.LocalStorage:
+      case PersistenceTypes.LocalStorage: {
         let localStorageService = new LocalStorageService();
         storageItem = localStorageService.retrieve(
           this._databaseSettings.databaseName
         );
         if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
+      }
 
       //retrieve from sessionStorage service
-      case PersistenceTypes.SessionStorage:
+      case PersistenceTypes.SessionStorage: {
         let sessionStorageService = new SessionStorageService();
         storageItem = sessionStorageService.retrieve(
           this._databaseSettings.databaseName
         );
         if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
+      }
 
       //retrieve from indexedDB service
-      case PersistenceTypes.IndexedDB:
+      case PersistenceTypes.IndexedDB: {
         data = await this._indexedDBService.retrieve();
+
+        // If no data is found in indexedDB, check sessionStorage for data.
+        // This is a workaround for the issue where the data is not being retrieved from indexedDB.
+        if (data.length <= 0) {
+          let fromIndexedDB = window.sessionStorage.getItem("fromIndexedDB");
+          if (
+            fromIndexedDB != null ||
+            fromIndexedDB != undefined ||
+            fromIndexedDB != ""
+          ) {
+            data = JSON.parse(fromIndexedDB);
+          }
+        }
+        console.log("Data retrieved from indexedDB: ", data);
+
         break;
+      }
 
       default:
         break;
@@ -106,34 +127,57 @@ export class DataService {
 
     switch (databaseSettings.persistenceType) {
       //retrieve from cookie service
-      case PersistenceTypes.Cookie:
+      case PersistenceTypes.Cookie: {
         let cookieService = new CookieService();
         storageItem = cookieService.retrieve(databaseSettings.databaseName);
         if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
+      }
 
       //retrieve from LocalStorage service
-      case PersistenceTypes.LocalStorage:
+      case PersistenceTypes.LocalStorage: {
         let localStorageService = new LocalStorageService();
         storageItem = localStorageService.retrieve(
           databaseSettings.databaseName
         );
         if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
+      }
 
       //retrieve from sessionStorage service
-      case PersistenceTypes.SessionStorage:
+      case PersistenceTypes.SessionStorage: {
         let sessionStorageService = new SessionStorageService();
         storageItem = sessionStorageService.retrieve(
           databaseSettings.databaseName
         );
         if (storageItem != null) data = JSON.parse(storageItem.Value);
         break;
+      }
 
       //retrieve from indexedDB service
-      case PersistenceTypes.IndexedDB:
-        data = await this._indexedDBService.retrieve();
+      case PersistenceTypes.IndexedDB: {
+        let requestItems = await this._indexedDBService.retrieve(
+          databaseSettings
+        );
+
+        // If no data is found in indexedDB, check sessionStorage for data.
+        // This is a workaround for the issue where the data is not being retrieved from indexedDB.
+        if (requestItems.length <= 0) {
+          let fromIndexedDB = window.sessionStorage.getItem("fromIndexedDB");
+          if (
+            fromIndexedDB != null ||
+            fromIndexedDB != undefined ||
+            fromIndexedDB != ""
+          ) {
+            data = JSON.parse(fromIndexedDB);
+          }
+        }
+        if (data == null) {
+          data = [];
+        }
+        console.log("Data retrieved from indexedDB: ", data);
         break;
+      }
 
       default:
         break;
@@ -149,23 +193,26 @@ export class DataService {
   async persist(items) {
     switch (this._persistenceType) {
       //persist to Cookie service
-      case PersistenceTypes.Cookie:
+      case PersistenceTypes.Cookie: {
         let cookieService = new CookieService();
         let cookieData = JSON.stringify(items);
         cookieService.save(this.databaseSettings.databaseName, cookieData);
         break;
+      }
 
       //persist to LocalStorage service
-      case PersistenceTypes.LocalStorage:
+      case PersistenceTypes.LocalStorage: {
         let localStorageService = new LocalStorageService();
         localStorageService.save(this._database, JSON.stringify(items));
         break;
+      }
 
       //persist to sessionStorage service
-      case PersistenceTypes.SessionStorage:
+      case PersistenceTypes.SessionStorage: {
         let sessionStorageService = new SessionStorageService();
         sessionStorageService.save(this._database, JSON.stringify(items));
         break;
+      }
 
       //persist to indexedDB service
       case PersistenceTypes.IndexedDB:
@@ -185,29 +232,32 @@ export class DataService {
   async persist(databaseSettings, items) {
     switch (databaseSettings.persistenceType) {
       //persist to Cookie service
-      case PersistenceTypes.Cookie:
+      case PersistenceTypes.Cookie: {
         let cookieService = new CookieService();
         let cookieData = JSON.stringify(items);
         cookieService.save(databaseSettings.databaseName, cookieData);
         break;
+      }
 
       //persist to LocalStorage service
-      case PersistenceTypes.LocalStorage:
+      case PersistenceTypes.LocalStorage: {
         let localStorageService = new LocalStorageService();
         localStorageService.save(
           databaseSettings.databaseName,
           JSON.stringify(items)
         );
         break;
+      }
 
       //persist to sessionStorage service
-      case PersistenceTypes.SessionStorage:
+      case PersistenceTypes.SessionStorage: {
         let sessionStorageService = new SessionStorageService();
         sessionStorageService.save(
           databaseSettings.databaseName,
           JSON.stringify(items)
         );
         break;
+      }
 
       //persist to indexedDB service
       case PersistenceTypes.IndexedDB:

@@ -101,6 +101,7 @@ export class IndexedDBService {
     let data = [];
 
     if (this._database != null) {
+      this.initializeIndexDB();
       let transaction = await this.getTransaction();
 
       this._objectStore = await transaction.objectStore(
@@ -114,10 +115,13 @@ export class IndexedDBService {
           data.push(item);
         });
         console.log({ requestItems }, { data });
+
+        // A workaround for the issue of data not being returned This should be removed.
+        window.sessionStorage.setItem("fromIndexedDB", JSON.stringify(data));
       };
 
       transaction.oncomplete = (e) => {
-        console.log("read success", e);
+        console.log("read complete", e);
       };
 
       transaction.onerror = (e) => {
@@ -143,7 +147,7 @@ export class IndexedDBService {
     items.forEach((item) => {
       let addRequest = store.put(item);
       addRequest.onsuccess = (e) => {
-        console.log("Item added", item);
+        console.log("Item added", item, e);
       };
       addRequest.onerror = (e) => {
         console.warn("error, item NOT saved", e);

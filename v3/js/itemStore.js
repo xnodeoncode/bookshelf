@@ -32,7 +32,7 @@ import { DatabaseSettings } from "./services/databaseSettings.js";
  * Import custom exception classes
  ***********************************************************************/
 import {
-  PersistenceServiceNotEnabled,
+  //PersistenceServiceNotEnabled,
   DataServiceUnavailable,
 } from "./services/exceptions.js";
 
@@ -299,6 +299,7 @@ export class ItemStore {
       let context = new DataService(databaseSettings);
       return context;
     } catch (e) {
+      console.log(e);
       throw e;
     }
   }

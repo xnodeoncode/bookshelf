@@ -141,11 +141,9 @@ const markUp =
       event.preventDefault();
     });
 
-  document
-    .getElementById("reload-data")
-    .addEventListener("click", function (event) {
-      seedTheRepository();
-    });
+  document.getElementById("reload-data").addEventListener("click", function () {
+    seedTheRepository();
+  });
 
   // seed the collection and update the display
   seedTheRepository();
@@ -246,14 +244,14 @@ function updateListDisplay() {
     actionsTD.appendChild(s);
 
     // create link to delete the book.
-    var a = document.createElement("a");
-    a.setAttribute("href", "#");
-    a.setAttribute("id", "d-" + book.id);
-    a.setAttribute("data-book-id", book.id);
-    a.setAttribute("data-action", "delete");
-    a.innerHTML = "<span>delete</span>";
-    actionsTD.appendChild(a);
-    a.addEventListener("click", function (event) {
+    var d = document.createElement("a");
+    d.setAttribute("href", "#");
+    d.setAttribute("id", "d-" + book.id);
+    d.setAttribute("data-book-id", book.id);
+    d.setAttribute("data-action", "delete");
+    d.innerHTML = "<span>delete</span>";
+    actionsTD.appendChild(d);
+    d.addEventListener("click", function (event) {
       deleteBook(this.dataset.bookId);
       event.preventDefault();
     });
