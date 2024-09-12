@@ -47,5 +47,12 @@ export class CookieService {
    * Deletes a document cookie.
    * CookieName|string: The name of the cookie tha will be deleted.
    ************************************************************************************/
-  remove(cookieName) {}
+  remove(cookieName) {
+    let cookie = {
+      name: `${cookieName}`,
+      value: "",
+      expires: Date.now(),
+    };
+    cookieStore.set(cookie);
+  }
 }
