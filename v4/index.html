@@ -2,27 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-
-    <!-- Suppress Google's FLoC warning
-    https://github.com/orgs/community/discussions/52356
-    The "Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'interest-cohort'."
-    warning is related to Google's FLoC (Federated Learning of Cohorts) experiment, which is a part of their Privacy Sandbox initiative.
-    This error is not critical and should not cause your page to fail to load. However, if you want to suppress this warning,
-    you could try and set the Permissions-Policy header for your site: -->
-    <meta http-equiv="Permissions-Policy" content="interest-cohort=()" />
-
-    <link rel="stylesheet" type="text/css" href="./css/site.css" />
-    <title>App</title>
+    <title>Bookshelf v4</title>
   </head>
-
   <body>
-    <div id="container"></div>
-    <!--
-    The main must be declared as a module via the type attribute.
-    This ensures that the imports will work.
-    -->
-    <script type="module" src="./js/app.js"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
