@@ -2,7 +2,12 @@ import { PropTypes } from "prop-types";
 import { useState } from "react";
 import styles from "./BookForm.module.css";
 
-export function BookForm({ books, updateBooks }) {
+export function BookForm({
+  books,
+  updateBooks,
+  selectedBook,
+  setSelectedBook,
+}) {
   const [book, updateBook] = useState({
     id: "",
     title: "",
@@ -11,12 +16,44 @@ export function BookForm({ books, updateBooks }) {
     description: "",
   });
 
+  if (selectedBook.id && selectedBook.id !== book.id) {
+    updateBook(selectedBook);
+  }
+
+  function clearForm(e) {
+    selectedBook = {
+      id: "",
+      title: "",
+      author: "",
+      pageCount: 0,
+      description: "",
+    };
+    setSelectedBook(selectedBook);
+    updateBook(selectedBook);
+    e.preventDefault();
+    return;
+  }
+
   function saveBook(e) {
+    if (selectedBook.id) {
+      updateBooks(
+        books.map((b) => {
+          if (b.id === selectedBook.id) {
+            return selectedBook;
+          }
+          return b;
+        })
+      );
+      updateBook({});
+      e.preventDefault();
+      return;
+    }
     book.id = new Date().getTime();
     console.log(book);
     updateBook({ ...book });
 
     updateBooks([...books, book]);
+    book = {};
     e.preventDefault();
   }
 
@@ -64,6 +101,7 @@ export function BookForm({ books, updateBooks }) {
           }
         />
         <button type="submit">Save</button>
+        <button onClick={(e) => clearForm(e)}>Clear</button>
       </form>
     </div>
   );

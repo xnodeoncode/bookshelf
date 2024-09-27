@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import styles from "./Book.module.css";
 
-export default function Book({ book, books, updateBooks }) {
+export default function Book({ book, books, updateBooks, setSelectedBook }) {
   function deleteBook(book) {
     updateBooks(books.filter((b) => b.id !== book.id));
   }
@@ -9,17 +9,18 @@ export default function Book({ book, books, updateBooks }) {
   return (
     <>
       <div className={styles.item}>
-        {book.id}
-        {book.title}
-        {book.author}
-
-        <button
-          className={styles.button}
-          id={book.id}
-          onClick={() => deleteBook(book)}
-        >
-          x
-        </button>
+        <div className={styles.itemInfo}>
+          <h3>{book.title}</h3>
+          Author: {book.author} | Pages: {book.pageCount}
+        </div>
+        <div className={styles.buttons}>
+          <button id={book.id} onClick={() => setSelectedBook(book)}>
+            ✏️
+          </button>
+          <button id={book.id} onClick={() => deleteBook(book)}>
+            🗑️
+          </button>
+        </div>
       </div>
     </>
   );
