@@ -21,3 +21,12 @@
 
 - Code cleanup - removed unused artifacts and completed documentation.
 - Implemented StorageItem class.
+
+#### September 11, 2024
+
+- Merged v3 into master and synced repository.
+- v3 adds support for IndexedDB.
+
+#### September 12, 2024
+
+- v4 Rebuilt using React + Vite.
