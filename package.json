@@ -1,0 +1,27 @@
+{
+  "name": "bookshelf",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "bacardi.bryant@outlook.com",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/compat": "^1.1.0",
+    "@eslint/js": "^9.5.0",
+    "eslint": "^9.5.0",
+    "eslint-plugin-react": "^7.34.3",
+    "globals": "^15.6.0",
+    "typescript-eslint": "^7.14.1"
+  },
+  "overrides": {
+    "eslint": "^9.5.0"
+  },
+  "dependencies": {
+    "crypto-js": "^4.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
