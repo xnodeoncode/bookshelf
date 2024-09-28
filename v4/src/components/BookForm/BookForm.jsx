@@ -36,16 +36,9 @@ export function BookForm({
 
   function saveBook(e) {
     if (selectedBook.id) {
-      updateBooks(
-        books.map((b) => {
-          if (b.id === selectedBook.id) {
-            return selectedBook;
-          }
-          return b;
-        })
-      );
-      updateBook({});
-      e.preventDefault();
+      const bookIndex = books.findIndex((b) => b.id === selectedBook.id);
+      books[bookIndex] = book;
+      updateBooks([...books]);
       return;
     }
     book.id = new Date().getTime();
@@ -53,7 +46,7 @@ export function BookForm({
     updateBook({ ...book });
 
     updateBooks([...books, book]);
-    book = {};
+    clearForm(e);
     e.preventDefault();
   }
 
