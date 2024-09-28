@@ -4,6 +4,8 @@
   "private": true,
   "version": "4.1.2",
   "type": "module",
+  "author": "bacardi.bryant@outlook.com",
+  "license": "MIT",
   "scripts": {
     "predeploy": "vite build",
     "deploy": "gh-pages -d build",
