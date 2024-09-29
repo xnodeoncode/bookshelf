@@ -15,8 +15,8 @@ export default function Book({ book, books, updateBooks, setSelectedBook }) {
         </div>
         <div className={styles.buttons}>
           <button
-            type="button"
             id={"e_" + book.id}
+            type="button"
             onClick={() => setSelectedBook(book)}
           >
             ✏️

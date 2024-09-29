@@ -74,7 +74,7 @@ export function BookForm({
           id="author"
           name="author"
           value={book.author}
-          placeholder="Enter book author"
+          placeholder="Enter author name"
           onChange={(e) =>
             updateBook({
               ...book,
