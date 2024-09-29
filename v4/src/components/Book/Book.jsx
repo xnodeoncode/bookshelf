@@ -14,10 +14,18 @@ export default function Book({ book, books, updateBooks, setSelectedBook }) {
           Author: {book.author} | Pages: {book.pageCount}
         </div>
         <div className={styles.buttons}>
-          <button id={book.id} onClick={() => setSelectedBook(book)}>
+          <button
+            type="button"
+            id={"e_" + book.id}
+            onClick={() => setSelectedBook(book)}
+          >
             ✏️
           </button>
-          <button id={book.id} onClick={() => deleteBook(book)}>
+          <button
+            type="button"
+            id={"d_" + book.id}
+            onClick={() => deleteBook(book)}
+          >
             🗑️
           </button>
         </div>
