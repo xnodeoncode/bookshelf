@@ -57,6 +57,7 @@ export function BookForm({
         <label htmlFor="title">Title:</label>
         <input
           type="text"
+          autoFocus={true}
           id="title"
           name="title"
           value={book.title}
