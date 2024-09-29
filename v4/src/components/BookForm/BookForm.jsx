@@ -54,12 +54,13 @@ export function BookForm({
     <div className={styles.container}>
       <h3>Add a Book</h3>
       <form onSubmit={saveBook}>
-        <label htmlFor="name">Title:</label>
+        <label htmlFor="title">Title:</label>
         <input
           type="text"
           id="title"
           name="title"
           value={book.title}
+          placeholder="Enter book title"
           onChange={(e) =>
             updateBook({
               ...book,
@@ -73,6 +74,7 @@ export function BookForm({
           id="author"
           name="author"
           value={book.author}
+          placeholder="Enter author name"
           onChange={(e) =>
             updateBook({
               ...book,
@@ -86,6 +88,7 @@ export function BookForm({
           id="pageCount"
           name="pageCount"
           value={book.pageCount}
+          placeholder="Enter page count"
           onChange={(e) =>
             updateBook({
               ...book,
@@ -94,7 +97,9 @@ export function BookForm({
           }
         />
         <button type="submit">Save</button>
-        <button onClick={(e) => clearForm(e)}>Clear</button>
+        <button type="reset" onClick={(e) => clearForm(e)}>
+          Clear
+        </button>
       </form>
     </div>
   );
