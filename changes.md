@@ -30,3 +30,8 @@
 #### September 12, 2024
 
 - v4 Rebuilt using React + Vite.
+
+#### September 28, 2024
+
+- Code optimizations.
+- UI enhancements.
