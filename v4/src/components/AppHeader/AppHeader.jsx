@@ -5,7 +5,7 @@ export default function AppHeader() {
     description: "A library of books",
     author: "Bacardi Bryant",
     keywords: ["library", "books", "ReactJS", "Vite", "JavaScript"],
-    version: "4.1.2",
+    version: "4.2.2",
   };
   return (
     <header className={header}>
