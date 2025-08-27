@@ -2,9 +2,10 @@ import { BookForm } from "../BookForm/BookForm";
 import { BookList } from "../BookList/BookList";
 import { useLocalStorage } from "../../servicehooks/useLocalStorage.jsx";
 import { useState } from "react";
+import { useDataContext } from "../../servicehooks/useDataContext.jsx";
 
 export default function BookShelf() {
-  const [books, updateBooks] = useLocalStorage("MyBookShelf", []);
+  const [books, updateBooks] = useDataContext([]);
   const [selectedBook, setSelectedBook] = useState({});
   return (
     <>
