@@ -2,7 +2,7 @@
   "homepage": "https://github.com/xnodeoncode/bookshelf",
   "name": "bookshelf",
   "private": true,
-  "version": "4.2.2",
+  "version": "4.2.3",
   "type": "module",
   "keywords": [
     "library",
@@ -25,7 +25,10 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "checkin": "git add . && git commit -m \"See CHANGES.md for a list of revisions.\" "
+    "checkin": "git add . && git commit -m \"See CHANGES.md for a list of revisions.\" ",
+    "patch": "npm version patch",
+    "minor": "npm version minor",
+    "major": "npm version major"
   },
   "dependencies": {
     "i45": "^2.0.0",
