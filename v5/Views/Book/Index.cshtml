@@ -1,0 +1,39 @@
+﻿@model IEnumerable<bookshelf.Models.Book>
+@{
+    ViewData["Title"] = "Bookshelf v5 | Books";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Featured Titles</h1>
+</div>
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-primary">Add New Book</a>
+</div>
+<div class="row">
+    @foreach (var book in Model)
+    {
+        <div class="col-md-4">
+            <div class="card mb-4 box-shadow">
+            @if (!string.IsNullOrEmpty(book.CoverImageUrl))
+            {
+                <img class="card-img-top" src="@book.CoverImageUrl" alt="Card image cap" />
+            }
+                <div class="card-body">
+                    <h5 class="card-title">@book.Title</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <small class="text-muted">(@book.PageCount pages)</small>
+                    <a href="@Url.Action("Details", "Book", new { id = book.Id })" class="btn btn-sm btn-outline-secondary">Details</a>
+                    </div>
+                    <p class="card-text">@book.Description</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <a href="@Url.Action("Edit", "Book", new { id = book.Id })" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <a href="@book.PurchaseLink" class="btn btn-sm  btn-outline-secondary" target="_blank">Buy</a>
+                        </div>
+                        <small class="text-muted">@book.Author</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

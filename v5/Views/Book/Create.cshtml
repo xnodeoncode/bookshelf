@@ -1,0 +1,67 @@
+@model bookshelf.Models.Book
+@{
+    ViewData["Title"] = "Bookshelf v5 | Create New Book";
+}
+<h2>Create New Book</h2>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" value="0" />
+    <input type="hidden" asp-for="DeletedAt" value="" />
+    <div>
+        <label asp-for="Title"></label>
+        <input asp-for="Title" />
+    </div>
+    <div>
+        <label asp-for="Author"></label>
+        <input asp-for="Author" />
+    </div>
+    <div>
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description"></textarea>
+    </div>
+    <div>
+        <label asp-for="ISBN"></label>
+        <input asp-for="ISBN" />
+    </div>
+    <div>
+        <label asp-for="PublishedDate"></label>
+        <input asp-for="PublishedDate" type="date" />
+    </div>
+    <div>
+        <label asp-for="Publisher"></label>
+        <input asp-for="Publisher" />
+    </div>
+    <div>
+        <label asp-for="CoverImageUrl"></label>
+        <input asp-for="CoverImageUrl" />
+    </div>
+    <div>
+        <label asp-for="PurchaseLink"></label>
+        <input asp-for="PurchaseLink" />
+    </div>
+    <div>
+        <label asp-for="PageCount"></label>
+        <input asp-for="PageCount" type="number" />
+    </div>
+    <button type="submit">Create</button>
+</form>
+<div>
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="text-danger">
+            <h4>Validation Errors:</h4>
+            <ul>
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

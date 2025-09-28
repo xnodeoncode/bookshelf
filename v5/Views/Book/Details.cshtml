@@ -1,0 +1,28 @@
+@model bookshelf.Models.Book
+@{
+    ViewData["Title"] = "Bookshelf v5 | Details of " + Model.Title;
+}
+<h2>Details of @Model.Title</h2>
+<div>
+    <h3>@Model.Title</h3>
+    <p><strong>Author:</strong> @Model.Author</p>
+    <p><strong>Description:</strong> @Model.Description</p>
+    <p><strong>ISBN:</strong> @Model.ISBN</p>
+    <p><strong>Published Date:</strong> @(Model.PublishedDate?.ToString("d") ?? "N/A")</p>
+    <p><strong>Publisher:</strong> @Model.Publisher</p>
+    <p><strong>Page Count:</strong> @Model.PageCount</p>
+    @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+    {
+        <div>
+            <img src="@Model.CoverImageUrl" alt="Cover image of @Model.Title" style="max-width:200px;" />
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Model.PurchaseLink))
+    {
+        <p><a href="@Model.PurchaseLink" target="_blank">Purchase this book</a></p>
+    }
+</div>
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</p>
